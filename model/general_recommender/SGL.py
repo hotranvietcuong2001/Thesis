@@ -130,33 +130,33 @@ class SGL(AbstractRecommender):
         return adj_matrix
     
     def _create_variable(self):
-        with tf.name_scope("input_data"):
-            self.users = tf.placeholder(tf.int32, shape=(None,))
-            self.pos_items = tf.placeholder(tf.int32, shape=(None,))
-            self.neg_items = tf.placeholder(tf.int32, shape=(None,))
+        with tf.compat.v1.name_scope("input_data"):
+            self.users = tf.compat.v1.placeholder(tf.int32, shape=(None,))
+            self.pos_items = tf.compat.v1.placeholder(tf.int32, shape=(None,))
+            self.neg_items = tf.compat.v1.placeholder(tf.int32, shape=(None,))
 
             self.sub_mat = {}
             if self.aug_type in [0, 1]:
-                self.sub_mat['adj_values_sub1'] = tf.placeholder(tf.float32)
-                self.sub_mat['adj_indices_sub1'] = tf.placeholder(tf.int64)
-                self.sub_mat['adj_shape_sub1'] = tf.placeholder(tf.int64)
+                self.sub_mat['adj_values_sub1'] = tf.compat.v1.placeholder(tf.float32)
+                self.sub_mat['adj_indices_sub1'] = tf.compat.v1.placeholder(tf.int64)
+                self.sub_mat['adj_shape_sub1'] = tf.compat.v1.placeholder(tf.int64)
                 
-                self.sub_mat['adj_values_sub2'] = tf.placeholder(tf.float32)
-                self.sub_mat['adj_indices_sub2'] = tf.placeholder(tf.int64)
-                self.sub_mat['adj_shape_sub2'] = tf.placeholder(tf.int64)
+                self.sub_mat['adj_values_sub2'] = tf.compat.v1.placeholder(tf.float32)
+                self.sub_mat['adj_indices_sub2'] = tf.compat.v1.placeholder(tf.int64)
+                self.sub_mat['adj_shape_sub2'] = tf.compat.v1.placeholder(tf.int64)
             else:
                 for k in range(1, self.n_layers + 1):
-                    self.sub_mat['adj_values_sub1%d' % k] = tf.placeholder(tf.float32, name='adj_values_sub1%d' % k)
-                    self.sub_mat['adj_indices_sub1%d' % k] = tf.placeholder(tf.int64, name='adj_indices_sub1%d' % k)
-                    self.sub_mat['adj_shape_sub1%d' % k] = tf.placeholder(tf.int64, name='adj_shape_sub1%d' % k)
+                    self.sub_mat['adj_values_sub1%d' % k] = tf.compat.v1.placeholder(tf.float32, name='adj_values_sub1%d' % k)
+                    self.sub_mat['adj_indices_sub1%d' % k] = tf.compat.v1.placeholder(tf.int64, name='adj_indices_sub1%d' % k)
+                    self.sub_mat['adj_shape_sub1%d' % k] = tf.compat.v1.placeholder(tf.int64, name='adj_shape_sub1%d' % k)
 
-                    self.sub_mat['adj_values_sub2%d' % k] = tf.placeholder(tf.float32, name='adj_values_sub2%d' % k)
-                    self.sub_mat['adj_indices_sub2%d' % k] = tf.placeholder(tf.int64, name='adj_indices_sub2%d' % k)
-                    self.sub_mat['adj_shape_sub2%d' % k] = tf.placeholder(tf.int64, name='adj_shape_sub2%d' % k)
+                    self.sub_mat['adj_values_sub2%d' % k] = tf.compat.v1.placeholder(tf.float32, name='adj_values_sub2%d' % k)
+                    self.sub_mat['adj_indices_sub2%d' % k] = tf.compat.v1.placeholder(tf.int64, name='adj_indices_sub2%d' % k)
+                    self.sub_mat['adj_shape_sub2%d' % k] = tf.compat.v1.placeholder(tf.int64, name='adj_shape_sub2%d' % k)
 
-        with tf.name_scope("embedding_init"):
+        with tf.compat.v1.name_scope("embedding_init"):
             self.weights = dict()
-            initializer = tf.contrib.layers.xavier_initializer()
+            initializer = tf.compat.v1.keras.initializers.VarianceScaling(scale=1.0, mode="fan_avg", distribution="uniform")
             if self.pretrain:
                 pretrain_user_embedding = np.load(self.save_folder + 'user_embeddings.npy')
                 pretrain_item_embedding = np.load(self.save_folder + 'item_embeddings.npy')
@@ -170,14 +170,14 @@ class SGL(AbstractRecommender):
 
     def build_graph(self):
         self._create_variable()
-        with tf.name_scope("inference"):
+        with tf.compat.v1.name_scope("inference"):
             self.ua_embeddings, self.ia_embeddings, self.ua_embeddings_sub1, self.ia_embeddings_sub1, self.ua_embeddings_sub2, self.ia_embeddings_sub2 = self._create_lightgcn_SSL_embed()
 
         """
         *********************************************************
         Generate Predictions & Optimize via BPR loss.
         """
-        with tf.name_scope("loss"):
+        with tf.compat.v1.name_scope("loss"):
             if self.pretrain:
                 self.ssl_loss = tf.constant(0, dtype=tf.float32)
             else:
@@ -191,11 +191,11 @@ class SGL(AbstractRecommender):
             self.sl_loss, self.emb_loss = self.create_bpr_loss()
             self.loss = self.sl_loss + self.emb_loss + self.ssl_loss
 
-        with tf.name_scope("learner"):
+        with tf.compat.v1.name_scope("learner"):
             # self.opt = tf.train.AdamOptimizer(learning_rate=self.lr).minimize(self.loss)
             self.opt = learner.optimizer(self.learner, self.loss, self.lr)
 
-        self.saver = tf.train.Saver()
+        self.saver = tf.compat.v1.train.Saver()
 
     def _create_lightgcn_SSL_embed(self):
         for k in range(1, self.n_layers + 1):
@@ -227,31 +227,31 @@ class SGL(AbstractRecommender):
         all_embeddings_sub2 = [ego_embeddings_sub2]
 
         for k in range(1, self.n_layers + 1):
-            ego_embeddings = tf.sparse_tensor_dense_matmul(adj_mat, ego_embeddings, name="sparse_dense")
+            ego_embeddings = tf.sparse.sparse_dense_matmul(adj_mat, ego_embeddings, name="sparse_dense")
             all_embeddings += [ego_embeddings]
 
-            ego_embeddings_sub1 = tf.sparse_tensor_dense_matmul(
+            ego_embeddings_sub1 = tf.sparse.sparse_dense_matmul(
                 self.sub_mat['sub_mat_1%d' % k], 
                 ego_embeddings_sub1, name="sparse_dense_sub1%d" % k)
             # ego_embeddings_sub1 = tf.multiply(ego_embeddings_sub1, self.mask1)
             all_embeddings_sub1 += [ego_embeddings_sub1]
 
-            ego_embeddings_sub2 = tf.sparse_tensor_dense_matmul(
+            ego_embeddings_sub2 = tf.sparse.sparse_dense_matmul(
                 self.sub_mat['sub_mat_2%d' % k],
                 ego_embeddings_sub2, name="sparse_dense_sub2%d" % k)
             # ego_embeddings_sub2 = tf.multiply(ego_embeddings_sub2, self.mask2)
             all_embeddings_sub2 += [ego_embeddings_sub2]
 
         all_embeddings = tf.stack(all_embeddings, 1)
-        all_embeddings = tf.reduce_mean(all_embeddings, axis=1, keepdims=False)
+        all_embeddings = tf.reduce_mean(input_tensor=all_embeddings, axis=1, keepdims=False)
         u_g_embeddings, i_g_embeddings = tf.split(all_embeddings, [self.n_users, self.n_items], 0)
 
         all_embeddings_sub1 = tf.stack(all_embeddings_sub1, 1)
-        all_embeddings_sub1 = tf.reduce_mean(all_embeddings_sub1, axis=1, keepdims=False)
+        all_embeddings_sub1 = tf.reduce_mean(input_tensor=all_embeddings_sub1, axis=1, keepdims=False)
         u_g_embeddings_sub1, i_g_embeddings_sub1 = tf.split(all_embeddings_sub1, [self.n_users, self.n_items], 0)
 
         all_embeddings_sub2 = tf.stack(all_embeddings_sub2, 1)
-        all_embeddings_sub2 = tf.reduce_mean(all_embeddings_sub2, axis=1, keepdims=False)
+        all_embeddings_sub2 = tf.reduce_mean(input_tensor=all_embeddings_sub2, axis=1, keepdims=False)
         u_g_embeddings_sub2, i_g_embeddings_sub2 = tf.split(all_embeddings_sub2, [self.n_users, self.n_items], 0)
 
         return u_g_embeddings, i_g_embeddings, u_g_embeddings_sub1, i_g_embeddings_sub1, u_g_embeddings_sub2, i_g_embeddings_sub2
@@ -261,34 +261,34 @@ class SGL(AbstractRecommender):
         Calculating SSL loss
         '''
         # batch_users, _ = tf.unique(self.users)
-        user_emb1 = tf.nn.embedding_lookup(self.ua_embeddings_sub1, self.users)
-        user_emb2 = tf.nn.embedding_lookup(self.ua_embeddings_sub2, self.users)
+        user_emb1 = tf.nn.embedding_lookup(params=self.ua_embeddings_sub1, ids=self.users)
+        user_emb2 = tf.nn.embedding_lookup(params=self.ua_embeddings_sub2, ids=self.users)
         normalize_user_emb1 = tf.nn.l2_normalize(user_emb1, 1)
         normalize_user_emb2 = tf.nn.l2_normalize(user_emb2, 1)
         
         # batch_items, _ = tf.unique(self.pos_items)
-        item_emb1 = tf.nn.embedding_lookup(self.ia_embeddings_sub1, self.pos_items)
-        item_emb2 = tf.nn.embedding_lookup(self.ia_embeddings_sub2, self.pos_items)
+        item_emb1 = tf.nn.embedding_lookup(params=self.ia_embeddings_sub1, ids=self.pos_items)
+        item_emb2 = tf.nn.embedding_lookup(params=self.ia_embeddings_sub2, ids=self.pos_items)
         normalize_item_emb1 = tf.nn.l2_normalize(item_emb1, 1)
         normalize_item_emb2 = tf.nn.l2_normalize(item_emb2, 1)
 
         normalize_user_emb2_neg = normalize_user_emb2
         normalize_item_emb2_neg = normalize_item_emb2
 
-        pos_score_user = tf.reduce_sum(tf.multiply(normalize_user_emb1, normalize_user_emb2), axis=1)
+        pos_score_user = tf.reduce_sum(input_tensor=tf.multiply(normalize_user_emb1, normalize_user_emb2), axis=1)
         ttl_score_user = tf.matmul(normalize_user_emb1, normalize_user_emb2_neg, transpose_a=False, transpose_b=True)
 
-        pos_score_item = tf.reduce_sum(tf.multiply(normalize_item_emb1, normalize_item_emb2), axis=1)
+        pos_score_item = tf.reduce_sum(input_tensor=tf.multiply(normalize_item_emb1, normalize_item_emb2), axis=1)
         ttl_score_item = tf.matmul(normalize_item_emb1, normalize_item_emb2_neg, transpose_a=False, transpose_b=True)      
 
         pos_score_user = tf.exp(pos_score_user / self.ssl_temp)
-        ttl_score_user = tf.reduce_sum(tf.exp(ttl_score_user / self.ssl_temp), axis=1)
+        ttl_score_user = tf.reduce_sum(input_tensor=tf.exp(ttl_score_user / self.ssl_temp), axis=1)
         pos_score_item = tf.exp(pos_score_item / self.ssl_temp)
-        ttl_score_item = tf.reduce_sum(tf.exp(ttl_score_item / self.ssl_temp), axis=1)
+        ttl_score_item = tf.reduce_sum(input_tensor=tf.exp(ttl_score_item / self.ssl_temp), axis=1)
 
         # ssl_loss = -tf.reduce_mean(tf.log(pos_score / ttl_score))
-        ssl_loss_user = -tf.reduce_sum(tf.log(pos_score_user / ttl_score_user))
-        ssl_loss_item = -tf.reduce_sum(tf.log(pos_score_item / ttl_score_item))
+        ssl_loss_user = -tf.reduce_sum(input_tensor=tf.math.log(pos_score_user / ttl_score_user))
+        ssl_loss_item = -tf.reduce_sum(input_tensor=tf.math.log(pos_score_item / ttl_score_item))
         ssl_loss = self.ssl_reg * (ssl_loss_user + ssl_loss_item)
         return ssl_loss
 
@@ -297,34 +297,34 @@ class SGL(AbstractRecommender):
         The denominator is summing over all the user or item nodes in the whole grpah
         '''
         if self.ssl_mode in ['user_side', 'both_side']:
-            user_emb1 = tf.nn.embedding_lookup(self.ua_embeddings_sub1, self.users)
-            user_emb2 = tf.nn.embedding_lookup(self.ua_embeddings_sub2, self.users)
+            user_emb1 = tf.nn.embedding_lookup(params=self.ua_embeddings_sub1, ids=self.users)
+            user_emb2 = tf.nn.embedding_lookup(params=self.ua_embeddings_sub2, ids=self.users)
 
             normalize_user_emb1 = tf.nn.l2_normalize(user_emb1, 1)
             normalize_user_emb2 = tf.nn.l2_normalize(user_emb2, 1)
             normalize_all_user_emb2 = tf.nn.l2_normalize(self.ua_embeddings_sub2, 1)
-            pos_score_user = tf.reduce_sum(tf.multiply(normalize_user_emb1, normalize_user_emb2), axis=1)
+            pos_score_user = tf.reduce_sum(input_tensor=tf.multiply(normalize_user_emb1, normalize_user_emb2), axis=1)
             ttl_score_user = tf.matmul(normalize_user_emb1, normalize_all_user_emb2, transpose_a=False, transpose_b=True)
 
             pos_score_user = tf.exp(pos_score_user / self.ssl_temp)
-            ttl_score_user = tf.reduce_sum(tf.exp(ttl_score_user / self.ssl_temp), axis=1)
+            ttl_score_user = tf.reduce_sum(input_tensor=tf.exp(ttl_score_user / self.ssl_temp), axis=1)
 
-            ssl_loss_user = -tf.reduce_sum(tf.log(pos_score_user / ttl_score_user))
+            ssl_loss_user = -tf.reduce_sum(input_tensor=tf.math.log(pos_score_user / ttl_score_user))
         
         if self.ssl_mode in ['item_side', 'both_side']:
-            item_emb1 = tf.nn.embedding_lookup(self.ia_embeddings_sub1, self.pos_items)
-            item_emb2 = tf.nn.embedding_lookup(self.ia_embeddings_sub2, self.pos_items)
+            item_emb1 = tf.nn.embedding_lookup(params=self.ia_embeddings_sub1, ids=self.pos_items)
+            item_emb2 = tf.nn.embedding_lookup(params=self.ia_embeddings_sub2, ids=self.pos_items)
 
             normalize_item_emb1 = tf.nn.l2_normalize(item_emb1, 1)
             normalize_item_emb2 = tf.nn.l2_normalize(item_emb2, 1)
             normalize_all_item_emb2 = tf.nn.l2_normalize(self.ia_embeddings_sub2, 1)
-            pos_score_item = tf.reduce_sum(tf.multiply(normalize_item_emb1, normalize_item_emb2), axis=1)
+            pos_score_item = tf.reduce_sum(input_tensor=tf.multiply(normalize_item_emb1, normalize_item_emb2), axis=1)
             ttl_score_item = tf.matmul(normalize_item_emb1, normalize_all_item_emb2, transpose_a=False, transpose_b=True)
             
             pos_score_item = tf.exp(pos_score_item / self.ssl_temp)
-            ttl_score_item = tf.reduce_sum(tf.exp(ttl_score_item / self.ssl_temp), axis=1)
+            ttl_score_item = tf.reduce_sum(input_tensor=tf.exp(ttl_score_item / self.ssl_temp), axis=1)
 
-            ssl_loss_item = -tf.reduce_sum(tf.log(pos_score_item / ttl_score_item))
+            ssl_loss_item = -tf.reduce_sum(input_tensor=tf.math.log(pos_score_item / ttl_score_item))
 
         if self.ssl_mode == 'user_side':
             ssl_loss = self.ssl_reg * ssl_loss_user
@@ -340,12 +340,12 @@ class SGL(AbstractRecommender):
         The denominator is summation over the user and item examples in a batch
         '''
         batch_users, _ = tf.unique(self.users)
-        user_emb1 = tf.nn.embedding_lookup(self.ua_embeddings_sub1, batch_users)
-        user_emb2 = tf.nn.embedding_lookup(self.ua_embeddings_sub2, batch_users)
+        user_emb1 = tf.nn.embedding_lookup(params=self.ua_embeddings_sub1, ids=batch_users)
+        user_emb2 = tf.nn.embedding_lookup(params=self.ua_embeddings_sub2, ids=batch_users)
 
         batch_items, _ = tf.unique(self.pos_items)
-        item_emb1 = tf.nn.embedding_lookup(self.ia_embeddings_sub1, batch_items)
-        item_emb2 = tf.nn.embedding_lookup(self.ia_embeddings_sub2, batch_items)
+        item_emb1 = tf.nn.embedding_lookup(params=self.ia_embeddings_sub1, ids=batch_items)
+        item_emb2 = tf.nn.embedding_lookup(params=self.ia_embeddings_sub2, ids=batch_items)
 
         emb_merge1 = tf.concat([user_emb1, item_emb1], axis=0)
         emb_merge2 = tf.concat([user_emb2, item_emb2], axis=0)
@@ -354,35 +354,35 @@ class SGL(AbstractRecommender):
         normalize_emb_merge1 = tf.nn.l2_normalize(emb_merge1, 1)
         normalize_emb_merge2 = tf.nn.l2_normalize(emb_merge2, 1)
 
-        pos_score = tf.reduce_sum(tf.multiply(normalize_emb_merge1, normalize_emb_merge2), axis=1)
+        pos_score = tf.reduce_sum(input_tensor=tf.multiply(normalize_emb_merge1, normalize_emb_merge2), axis=1)
         ttl_score = tf.matmul(normalize_emb_merge1, normalize_emb_merge2, transpose_a=False, transpose_b=True)
 
         pos_score = tf.exp(pos_score / self.ssl_temp)
-        ttl_score = tf.reduce_sum(tf.exp(ttl_score / self.ssl_temp), axis=1)
-        ssl_loss = -tf.reduce_sum(tf.log(pos_score / ttl_score))
+        ttl_score = tf.reduce_sum(input_tensor=tf.exp(ttl_score / self.ssl_temp), axis=1)
+        ssl_loss = -tf.reduce_sum(input_tensor=tf.math.log(pos_score / ttl_score))
         ssl_loss = self.ssl_reg * ssl_loss
         return ssl_loss
 
     def create_bpr_loss(self):
-        batch_u_embeddings = tf.nn.embedding_lookup(self.ua_embeddings, self.users)
-        batch_pos_i_embeddings = tf.nn.embedding_lookup(self.ia_embeddings, self.pos_items)
-        batch_neg_i_embeddings = tf.nn.embedding_lookup(self.ia_embeddings, self.neg_items)
-        batch_u_embeddings_pre = tf.nn.embedding_lookup(self.weights['user_embedding'], self.users)
-        batch_pos_i_embeddings_pre = tf.nn.embedding_lookup(self.weights['item_embedding'], self.pos_items)
-        batch_neg_i_embeddings_pre = tf.nn.embedding_lookup(self.weights['item_embedding'], self.neg_items)
+        batch_u_embeddings = tf.nn.embedding_lookup(params=self.ua_embeddings, ids=self.users)
+        batch_pos_i_embeddings = tf.nn.embedding_lookup(params=self.ia_embeddings, ids=self.pos_items)
+        batch_neg_i_embeddings = tf.nn.embedding_lookup(params=self.ia_embeddings, ids=self.neg_items)
+        batch_u_embeddings_pre = tf.nn.embedding_lookup(params=self.weights['user_embedding'], ids=self.users)
+        batch_pos_i_embeddings_pre = tf.nn.embedding_lookup(params=self.weights['item_embedding'], ids=self.pos_items)
+        batch_neg_i_embeddings_pre = tf.nn.embedding_lookup(params=self.weights['item_embedding'], ids=self.neg_items)
         regularizer = l2_loss(batch_u_embeddings_pre, batch_pos_i_embeddings_pre, batch_neg_i_embeddings_pre)
         emb_loss = self.reg * regularizer
 
         pos_scores = inner_product(batch_u_embeddings, batch_pos_i_embeddings)
         neg_scores = inner_product(batch_u_embeddings, batch_neg_i_embeddings)
-        bpr_loss = tf.reduce_sum(log_loss(pos_scores - neg_scores))
+        bpr_loss = tf.reduce_sum(input_tensor=log_loss(pos_scores - neg_scores))
         # self.score_sigmoid = tf.sigmoid(pos_scores)
 
         self.grad_score = 1 - tf.sigmoid(pos_scores - neg_scores)
         self.grad_user_embed = (1 - tf.sigmoid(pos_scores - neg_scores)) * tf.sqrt(
-            tf.reduce_sum(tf.multiply(batch_u_embeddings, batch_u_embeddings), axis=1))
+            tf.reduce_sum(input_tensor=tf.multiply(batch_u_embeddings, batch_u_embeddings), axis=1))
         self.grad_item_embed = (1 - tf.sigmoid(pos_scores - neg_scores)) * tf.sqrt(
-            tf.reduce_sum(tf.multiply(batch_pos_i_embeddings, batch_pos_i_embeddings), axis=1))
+            tf.reduce_sum(input_tensor=tf.multiply(batch_pos_i_embeddings, batch_pos_i_embeddings), axis=1))
 
         return bpr_loss, emb_loss
     

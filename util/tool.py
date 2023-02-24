@@ -86,23 +86,23 @@ def csr_to_user_dict_bytime(time_matrix,train_matrix):
 
 def get_initializer(init_method, stddev):
         if init_method == 'tnormal':
-            return tf.truncated_normal_initializer(stddev=stddev)
+            return tf.compat.v1.truncated_normal_initializer(stddev=stddev)
         elif init_method == 'uniform':
-            return tf.random_uniform_initializer(-stddev, stddev)
+            return tf.compat.v1.random_uniform_initializer(-stddev, stddev)
         elif init_method == 'normal':
-            return tf.random_normal_initializer(stddev=stddev)
+            return tf.compat.v1.random_normal_initializer(stddev=stddev)
         elif init_method == 'xavier_normal':
-            return tf.contrib.layers.xavier_initializer(uniform=False)
+            return tf.compat.v1.keras.initializers.VarianceScaling(scale=1.0, mode="fan_avg", distribution=("uniform" if False else "truncated_normal"))
         elif init_method == 'xavier_uniform':
-            return tf.contrib.layers.xavier_initializer(uniform=True)
+            return tf.compat.v1.keras.initializers.VarianceScaling(scale=1.0, mode="fan_avg", distribution=("uniform" if True else "truncated_normal"))
         elif init_method == 'he_normal':
-            return tf.contrib.layers.variance_scaling_initializer(
-                factor=2.0, mode='FAN_IN', uniform=False)
+            return tf.compat.v1.keras.initializers.VarianceScaling(
+                scale=2.0, mode=('FAN_IN').lower(), distribution=("uniform" if False else "truncated_normal"))
         elif init_method == 'he_uniform':
-            return tf.contrib.layers.variance_scaling_initializer(
-                factor=2.0, mode='FAN_IN', uniform=True)
+            return tf.compat.v1.keras.initializers.VarianceScaling(
+                scale=2.0, mode=('FAN_IN').lower(), distribution=("uniform" if True else "truncated_normal"))
         else:
-            return tf.truncated_normal_initializer(stddev=stddev)  
+            return tf.compat.v1.truncated_normal_initializer(stddev=stddev)  
 
 
 def noise_validator(noise, allowed_noises):
@@ -239,8 +239,8 @@ def pad_sequences(sequences, value=0., max_len=None,
 
 
 def inner_product(a, b, name="inner_product"):
-    with tf.name_scope(name=name):
-        return tf.reduce_sum(tf.multiply(a, b), axis=-1)
+    with tf.compat.v1.name_scope(name=name):
+        return tf.reduce_sum(input_tensor=tf.multiply(a, b), axis=-1)
 
 
 def timer(func):
@@ -263,5 +263,5 @@ def l2_loss(*params):
 def log_loss(yij, name="log_loss"):
     """ bpr loss
     """
-    with tf.name_scope(name):
-        return -tf.log_sigmoid(yij)
+    with tf.compat.v1.name_scope(name):
+        return -tf.math.log_sigmoid(yij)

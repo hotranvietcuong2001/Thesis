@@ -10,7 +10,7 @@ from util import Configurator, tool
 
 np.random.seed(2018)
 random.seed(2018)
-tf.set_random_seed(2017)
+tf.compat.v1.set_random_seed(2017)
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 if __name__ == "__main__":
