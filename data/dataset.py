@@ -41,6 +41,12 @@ class Dataset(object):
         print('Data loading finished')
 
     def _get_data_path(self, config):
+        """
+        It returns the path to the original dataset and the path to the saved dataset
+        
+        :param config: the configuration file
+        :return: The original path and the saved path.
+        """
         data_path = config["data.input.path"]
         ori_prefix = os.path.join(data_path, self.dataset_name)
 

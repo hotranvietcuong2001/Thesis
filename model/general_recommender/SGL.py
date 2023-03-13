@@ -81,11 +81,24 @@ class SGL(AbstractRecommender):
             tool.ensureDir(self.save_folder)
 
     def _get_training_data(self):
+        """
+        It returns the user and item lists from the training data
+
+        :return: The user_list and item_list are being returned.
+        """
         user_list, item_list = self.dataset.get_train_interactions()
         return user_list, item_list
 
     # @timer
     def create_adj_mat(self, is_subgraph=False, aug_type=0):
+        """
+        The function takes in the training data and returns a normalized adjacency matrix
+        
+        :param is_subgraph: whether to use the subgraph of the original graph, defaults to False
+        (optional)
+        :param aug_type: 0: Node Dropout; 1: Edge Dropout; 2: Random Walk, defaults to 0 (optional)
+        :return: adj_matrix is a sparse matrix of size (n_nodes, n_nodes)
+        """
         n_nodes = self.n_users + self.n_items
         if is_subgraph and aug_type in [0, 1, 2] and self.ssl_ratio > 0:
             # data augmentation type --- 0: Node Dropout; 1: Edge Dropout; 2: Random Walk
@@ -464,7 +477,7 @@ class SGL(AbstractRecommender):
                 if flag:
                     self.best_epoch = epoch
                     stopping_step = 0
-                    self.logger.info("Find a better model.")
+                    self.logger.info("Found a better model.")
                     if self.save_flag:
                         self.logger.info("Save model to file as pretrain.")
                         self.saver.save(self.sess, self.tmp_model_folder)
@@ -490,6 +503,11 @@ class SGL(AbstractRecommender):
 
     # @timer
     def evaluate(self):
+        """
+        It evaluates the model and returns the evaluation results.
+        :return: The buf is the result of the evaluation, and flag is a boolean that is true if the current
+        result is better than the best result.
+        """
         self._cur_user_embeddings, self._cur_item_embeddings = self.sess.run([self.ua_embeddings, self.ia_embeddings])
         flag = False
         current_result, buf = self.evaluator.evaluate(self)

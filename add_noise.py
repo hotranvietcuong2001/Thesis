@@ -14,11 +14,7 @@ tf.compat.v1.set_random_seed(2017)
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 if __name__ == "__main__":
-    is_windows = sys.platform.startswith('win')
-    if is_windows:
-        root_folder = 'XXXXXX/PythonProjects/SGL/'
-    else:
-        root_folder = 'XXXXXX/PythonProjects/SGL/'
+    root_folder = './'
     conf = Configurator(root_folder + "NeuRec.properties", default_section="hyperparameters")
 
     dataset = Dataset(conf)
