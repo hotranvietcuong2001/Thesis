@@ -184,6 +184,13 @@ class SGL(AbstractRecommender):
     def build_graph(self):
         self._create_variable()
         with tf.compat.v1.name_scope("inference"):
+            # these are fed into the "loss" scope
+            # idea of LightGCN (from its paper):
+            # Specifically, after associating each user (item) with an ID embedding,
+            # we propagate the embeddings on the user-item interaction graph
+            # to refine them. We then combine the embeddings learned at
+            # different propagation layers with a weighted sum to obtain the final
+            # embedding for prediction.
             self.ua_embeddings, self.ia_embeddings, self.ua_embeddings_sub1, self.ia_embeddings_sub1, self.ua_embeddings_sub2, self.ia_embeddings_sub2 = self._create_lightgcn_SSL_embed()
 
         """
@@ -310,6 +317,7 @@ class SGL(AbstractRecommender):
         The denominator is summing over all the user or item nodes in the whole grpah
         '''
         if self.ssl_mode in ['user_side', 'both_side']:
+            # embedding_lookup no. 0, 1,...
             user_emb1 = tf.nn.embedding_lookup(params=self.ua_embeddings_sub1, ids=self.users)
             user_emb2 = tf.nn.embedding_lookup(params=self.ua_embeddings_sub2, ids=self.users)
 
@@ -377,6 +385,7 @@ class SGL(AbstractRecommender):
         return ssl_loss
 
     def create_bpr_loss(self):
+        # embedding_lookup no. 4, 5,...
         batch_u_embeddings = tf.nn.embedding_lookup(params=self.ua_embeddings, ids=self.users)
         batch_pos_i_embeddings = tf.nn.embedding_lookup(params=self.ia_embeddings, ids=self.pos_items)
         batch_neg_i_embeddings = tf.nn.embedding_lookup(params=self.ia_embeddings, ids=self.neg_items)
