@@ -184,13 +184,14 @@ class SGL(AbstractRecommender):
     def build_graph(self):
         self._create_variable()
         with tf.compat.v1.name_scope("inference"):
-            # these are fed into the "loss" scope
             # idea of LightGCN (from its paper):
             # Specifically, after associating each user (item) with an ID embedding,
             # we propagate the embeddings on the user-item interaction graph
             # to refine them. We then combine the embeddings learned at
             # different propagation layers with a weighted sum to obtain the final
             # embedding for prediction.
+            #
+            # these are fed into the "loss" scope
             self.ua_embeddings, self.ia_embeddings, self.ua_embeddings_sub1, self.ia_embeddings_sub1, self.ua_embeddings_sub2, self.ia_embeddings_sub2 = self._create_lightgcn_SSL_embed()
 
         """
