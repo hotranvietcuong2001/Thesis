@@ -53,4 +53,5 @@ if __name__ == "__main__":
 
         model.build_graph()
         sess.run(tf.compat.v1.global_variables_initializer())
+        # tf.compat.v1.summary.FileWriter("output", sess.graph)
         model.train_model()
