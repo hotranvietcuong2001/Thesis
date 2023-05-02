@@ -188,8 +188,8 @@ class SGL(AbstractRecommender):
             # Specifically, after associating each user (item) with an ID embedding,
             # we propagate the embeddings on the user-item interaction graph
             # to refine them. We then combine the embeddings learned at
-            # different propagation layers with a weighted sum to obtain the final
-            # embedding for prediction.
+            # different propagation layers with a weighted sum to obtain the FINAL
+            # EMBEDDINGS for prediction.
             #
             # these are fed into the "loss" scope
             self.ua_embeddings, self.ia_embeddings, self.ua_embeddings_sub1, self.ia_embeddings_sub1, self.ua_embeddings_sub2, self.ia_embeddings_sub2 = self._create_lightgcn_SSL_embed()
@@ -494,7 +494,7 @@ class SGL(AbstractRecommender):
                 else:
                     stopping_step += 1
                     if stopping_step >= self.stop_cnt:
-                        self.logger.info("Early stopping is trigger at epoch: {}".format(epoch))
+                        self.logger.info("Early stopping is triggered at epoch: {}".format(epoch))
                         break
 
         self.logger.info("best_result@epoch %d:\n" % self.best_epoch)
@@ -518,6 +518,9 @@ class SGL(AbstractRecommender):
         :return: The buf is the result of the evaluation, and flag is a boolean that is true if the current
         result is better than the best result.
         """
+        # when evaluating, the final embedding E = f_readout{E0, E1, ..., El} will be obtained
+        # then "user rankings" will be generated based on that set of embeddings using inner product on user embeddings and item embeddings
+        # said rankings will probably be compared to the original/test dataset in order to get an evaluation
         self._cur_user_embeddings, self._cur_item_embeddings = self.sess.run([self.ua_embeddings, self.ia_embeddings])
         flag = False
         current_result, buf = self.evaluator.evaluate(self)
