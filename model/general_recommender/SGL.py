@@ -148,6 +148,7 @@ class SGL(AbstractRecommender):
             self.pos_items = tf.compat.v1.placeholder(tf.int32, shape=(None,))
             self.neg_items = tf.compat.v1.placeholder(tf.int32, shape=(None,))
 
+            # these 'sub_mat' variables are for storing augmented graph data (2 graphs to be exact)
             self.sub_mat = {}
             if self.aug_type in [0, 1]:
                 self.sub_mat['adj_values_sub1'] = tf.compat.v1.placeholder(tf.float32)
@@ -167,6 +168,7 @@ class SGL(AbstractRecommender):
                     self.sub_mat['adj_indices_sub2%d' % k] = tf.compat.v1.placeholder(tf.int64, name='adj_indices_sub2%d' % k)
                     self.sub_mat['adj_shape_sub2%d' % k] = tf.compat.v1.placeholder(tf.int64, name='adj_shape_sub2%d' % k)
 
+        # these are actually the trainable parameters (weights) of the model, although they also serve as the initial embeddings
         with tf.compat.v1.name_scope("embedding_init"):
             self.weights = dict()
             initializer = tf.compat.v1.keras.initializers.VarianceScaling(scale=1.0, mode="fan_avg", distribution="uniform")
@@ -192,6 +194,7 @@ class SGL(AbstractRecommender):
             # EMBEDDINGS for prediction.
             #
             # these are fed into the "loss" scope
+            # ua_emb is the embeddings of users for the entire graph, ia_emb is for items...
             self.ua_embeddings, self.ia_embeddings, self.ua_embeddings_sub1, self.ia_embeddings_sub1, self.ua_embeddings_sub2, self.ia_embeddings_sub2 = self._create_lightgcn_SSL_embed()
 
         """
@@ -205,6 +208,7 @@ class SGL(AbstractRecommender):
                 if self.ssl_mode in ['user_side', 'item_side', 'both_side']:
                     # self.ssl_loss = self.calc_ssl_loss()
                     self.ssl_loss = self.calc_ssl_loss_v2()
+                    # self.ssl_loss = self.calc_new_loss()
                 elif self.ssl_mode in ['merge']:
                     self.ssl_loss = self.calc_ssl_loss_v3()
                 else:
@@ -219,6 +223,7 @@ class SGL(AbstractRecommender):
         self.saver = tf.compat.v1.train.Saver()
 
     def _create_lightgcn_SSL_embed(self):
+        # first, construct operations for the adjacency matrices of the augmented graphs
         for k in range(1, self.n_layers + 1):
             if self.aug_type in [0, 1]:
                 self.sub_mat['sub_mat_1%d' % k] = tf.SparseTensor(
@@ -240,6 +245,7 @@ class SGL(AbstractRecommender):
                     self.sub_mat['adj_shape_sub2%d' % k])
         adj_mat = self._convert_sp_mat_to_sp_tensor(self.norm_adj)
 
+        # [from LightGCN paper]: create embeddings matrix E
         ego_embeddings = tf.concat([self.weights['user_embedding'], self.weights['item_embedding']], axis=0)
         ego_embeddings_sub1 = ego_embeddings
         ego_embeddings_sub2 = ego_embeddings
@@ -247,6 +253,7 @@ class SGL(AbstractRecommender):
         all_embeddings_sub1 = [ego_embeddings_sub1]
         all_embeddings_sub2 = [ego_embeddings_sub2]
 
+        # [from LightGCN paper]: apply matrix multiplication of E, A, and D in each layer
         for k in range(1, self.n_layers + 1):
             ego_embeddings = tf.sparse.sparse_dense_matmul(adj_mat, ego_embeddings, name="sparse_dense")
             all_embeddings += [ego_embeddings]
@@ -263,6 +270,10 @@ class SGL(AbstractRecommender):
             # ego_embeddings_sub2 = tf.multiply(ego_embeddings_sub2, self.mask2)
             all_embeddings_sub2 += [ego_embeddings_sub2]
 
+        # [from LightGCN paper]: for each node (users & items) get the sum of all of its embeddings in every layer, then multiply that value by 1/(K+1)
+        # u_g_emb is the (u)ser's (e)mbedding of the entire (g)raph
+        # i_g_emb is the (i)tem's (e)mbedding of the entire (g)raph
+        # keep in mind that those variables are MATRICES, with dimensions |S| x d where S is the set (U or V) and d is the embedding size
         all_embeddings = tf.stack(all_embeddings, 1)
         all_embeddings = tf.reduce_mean(input_tensor=all_embeddings, axis=1, keepdims=False)
         u_g_embeddings, i_g_embeddings = tf.split(all_embeddings, [self.n_users, self.n_items], 0)
@@ -275,6 +286,7 @@ class SGL(AbstractRecommender):
         all_embeddings_sub2 = tf.reduce_mean(input_tensor=all_embeddings_sub2, axis=1, keepdims=False)
         u_g_embeddings_sub2, i_g_embeddings_sub2 = tf.split(all_embeddings_sub2, [self.n_users, self.n_items], 0)
 
+        # the return values are basically embeddings for all users and items for the original graphs, and two subgraphs
         return u_g_embeddings, i_g_embeddings, u_g_embeddings_sub1, i_g_embeddings_sub1, u_g_embeddings_sub2, i_g_embeddings_sub2
 
     def calc_ssl_loss(self):
@@ -313,26 +325,79 @@ class SGL(AbstractRecommender):
         ssl_loss = self.ssl_reg * (ssl_loss_user + ssl_loss_item)
         return ssl_loss
 
+    def calc_new_loss(self):
+        if self.ssl_mode in ['user_side', 'both_side']:
+            # embedding_lookup no. 0, 1,...
+            # these are the selected user embeddings of the two subgraphs that are randomly selected to act as positive pairs sample for ssl loss
+            # apparently, user_emb1 is z'_u and user_emb2 is z''_u
+            user_emb1 = tf.nn.embedding_lookup(params=self.ua_embeddings, ids=self.users)
+            user_emb2 = tf.nn.embedding_lookup(params=self.ua_embeddings_sub2, ids=self.users)
+
+            # normalize the embeddings of the pairs
+            normalize_user_emb1 = tf.nn.l2_normalize(user_emb1, 1)
+            normalize_user_emb2 = tf.nn.l2_normalize(user_emb2, 1)
+            # normalize all embeddings for users of subgraph 2
+            # it might not be obvious, but it seems like this matrix is used to sample negative samples z''_v
+            normalize_all_user_emb2 = tf.nn.l2_normalize(self.ua_embeddings_sub2, 1)
+            
+            # for ease of read, X and x from now will refer to the normalized embeddings Z, z
+            # this is actually the dot product (i.e. cosine similarity) of positive pair x'_u and x''_u but written like this for some reason
+            pos_score_user = tf.reduce_sum(input_tensor=tf.multiply(normalize_user_emb1, normalize_user_emb2), axis=1)
+
+            # this is the cosine similarity between negative pair x'_u and x''_v
+            # when written like this, the return value is a matrix M where M[u][v] denotes the similarity between x'_u and x''_v
+            ttl_score_user = tf.matmul(normalize_user_emb1, normalize_all_user_emb2, transpose_a=False, transpose_b=True)
+
+            # get the exponentiation of positive score divided by τ
+            pos_score_user = tf.exp(pos_score_user / self.ssl_temp)
+            # calculate the denominator
+            # first, the element-wise exponentiation of the score divided by τ is calculated, then all values along side the u'th row of M will be summed up and then reduced to one dimension
+            ttl_score_user = tf.reduce_sum(input_tensor=tf.exp(ttl_score_user / self.ssl_temp), axis=1)
+
+            # divide positive score by the negative score element-wise, then get the log, then finally, get the negative sum of all elements in vector
+            ssl_loss_user = -tf.reduce_sum(input_tensor=tf.math.log(pos_score_user / ttl_score_user))
+        
+        # similar to user's side
+        if self.ssl_mode in ['item_side', 'both_side']:
+            item_emb1 = tf.nn.embedding_lookup(params=self.ia_embeddings, ids=self.pos_items)
+            item_emb2 = tf.nn.embedding_lookup(params=self.ia_embeddings_sub2, ids=self.pos_items)
+
     def calc_ssl_loss_v2(self):
         '''
         The denominator is summing over all the user or item nodes in the whole grpah
         '''
         if self.ssl_mode in ['user_side', 'both_side']:
             # embedding_lookup no. 0, 1,...
+            # these are the selected user embeddings of the two subgraphs that are randomly selected to act as positive pairs sample for ssl loss
+            # apparently, user_emb1 is z'_u and user_emb2 is z''_u
             user_emb1 = tf.nn.embedding_lookup(params=self.ua_embeddings_sub1, ids=self.users)
             user_emb2 = tf.nn.embedding_lookup(params=self.ua_embeddings_sub2, ids=self.users)
 
+            # normalize the embeddings of the pairs
             normalize_user_emb1 = tf.nn.l2_normalize(user_emb1, 1)
             normalize_user_emb2 = tf.nn.l2_normalize(user_emb2, 1)
+            # normalize all embeddings for users of subgraph 2
+            # it might not be obvious, but it seems like this matrix is used to sample negative samples z''_v
             normalize_all_user_emb2 = tf.nn.l2_normalize(self.ua_embeddings_sub2, 1)
+            
+            # for ease of read, X and x from now will refer to the normalized embeddings Z, z
+            # this is actually the dot product (i.e. cosine similarity) of positive pair x'_u and x''_u but written like this for some reason
             pos_score_user = tf.reduce_sum(input_tensor=tf.multiply(normalize_user_emb1, normalize_user_emb2), axis=1)
+
+            # this is the cosine similarity between negative pair x'_u and x''_v
+            # when written like this, the return value is a matrix M where M[u][v] denotes the similarity between x'_u and x''_v
             ttl_score_user = tf.matmul(normalize_user_emb1, normalize_all_user_emb2, transpose_a=False, transpose_b=True)
 
+            # get the exponentiation of positive score divided by τ
             pos_score_user = tf.exp(pos_score_user / self.ssl_temp)
+            # calculate the denominator
+            # first, the element-wise exponentiation of the score divided by τ is calculated, then all values along side the u'th row of M will be summed up and then reduced to one dimension
             ttl_score_user = tf.reduce_sum(input_tensor=tf.exp(ttl_score_user / self.ssl_temp), axis=1)
 
+            # divide positive score by the negative score element-wise, then get the log, then finally, get the negative sum of all elements in vector
             ssl_loss_user = -tf.reduce_sum(input_tensor=tf.math.log(pos_score_user / ttl_score_user))
         
+        # similar to user's side
         if self.ssl_mode in ['item_side', 'both_side']:
             item_emb1 = tf.nn.embedding_lookup(params=self.ia_embeddings_sub1, ids=self.pos_items)
             item_emb2 = tf.nn.embedding_lookup(params=self.ia_embeddings_sub2, ids=self.pos_items)
