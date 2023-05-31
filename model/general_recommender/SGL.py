@@ -68,8 +68,8 @@ class SGL(AbstractRecommender):
             self.ssl_reg
         )
         self.pretrain = conf["pretrain"]
-        if self.pretrain:
-            self.epochs = 0
+        # if self.pretrain:
+        #    self.epochs = 0
         self.save_flag = conf["save_flag"]
         if self.pretrain or self.save_flag:
             self.tmp_model_folder = conf["proj_path"] + 'model_tmp/%s/%s/%s/' % (self.dataset_name, self.model_name, self.model_str)
