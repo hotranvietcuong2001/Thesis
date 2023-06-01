@@ -46,8 +46,6 @@ class SGL(AbstractRecommender):
         self.ssl_temp = conf["ssl_temp"]
         self.ssl_reg = conf["ssl_reg"]
         self.ssl_loss_type = conf["ssl_loss_type"]
-        print(self.ssl_loss_type)
-        exit()
 
         self.dataset = dataset
         self.n_users, self.n_items = self.dataset.num_users, self.dataset.num_items
@@ -76,9 +74,10 @@ class SGL(AbstractRecommender):
         self.save_flag = conf["save_flag"]
         if self.pretrain or self.save_flag:
             self.tmp_model_folder = conf["proj_path"] + 'model_tmp/%s/%s/%s/' % (self.dataset_name, self.model_name, self.model_str)
-            self.save_folder = conf["proj_path"] + 'dataset/pretrain-embeddings-%s/%s/n_layers=%d/' % (
+            self.save_folder = conf["proj_path"] + 'dataset/pretrain-embeddings-%s/%s%s/n_layers=%d/' % (
                 self.dataset_name, 
                 self.model_name,
+                "_dc_loss" if self.ssl_loss_type == 1 else "",
                 self.n_layers)
             tool.ensureDir(self.tmp_model_folder)
             tool.ensureDir(self.save_folder)
@@ -210,8 +209,11 @@ class SGL(AbstractRecommender):
             else:
                 if self.ssl_mode in ['user_side', 'item_side', 'both_side']:
                     # self.ssl_loss = self.calc_ssl_loss()
-                    # self.ssl_loss = self.calc_ssl_loss_v2()
-                    self.ssl_loss = self.calc_decoupled_loss()
+                    if self.ssl_loss_type == 0:
+                        self.ssl_loss = self.calc_ssl_loss_v2()
+                    else:
+                        print("Using decoupled loss")
+                        self.ssl_loss = self.calc_decoupled_loss()
                 elif self.ssl_mode in ['merge']:
                     self.ssl_loss = self.calc_ssl_loss_v3()
                 else:
