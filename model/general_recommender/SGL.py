@@ -345,7 +345,7 @@ class SGL(AbstractRecommender):
     def calc_debiased_loss(self):
         # Ng = max (( - N * tau_plus * pos + neg ) / (1 - tau_plus ) , N * e **( -1/ t))
         # debiased_loss = - log ( pos / ( pos + Ng ))
-        tau_plus = 0.1
+        tau_plus = 0.01
         if self.ssl_mode in ['user_side', 'both_side']:
             # embedding_lookup no. 0, 1,...
             # these are the selected user embeddings of the two subgraphs that are randomly selected to act as positive pairs sample for ssl loss
@@ -370,9 +370,9 @@ class SGL(AbstractRecommender):
             ttl_score_user = tf.matmul(normalize_user_emb1, normalize_all_user_emb2, transpose_a=False, transpose_b=True)
 
             # numerator
-            pos_score_user = tf.exp(pos_score_user)
+            pos_score_user = tf.exp(pos_score_user / self.ssl_temp)
             # denominator
-            ttl_score_user = tf.reduce_sum(input_tensor=tf.exp(ttl_score_user), axis=1)
+            ttl_score_user = tf.reduce_sum(input_tensor=tf.exp(ttl_score_user / self.ssl_temp), axis=1)
             N_u = tf.cast(tf.shape(ttl_score_user)[0] - 1, dtype=tf.float32)
             temp_e_u = tf.exp(tf.constant([-1 / self.ssl_temp]))
             ttl_score_user = tf.maximum((ttl_score_user - (N_u * tau_plus + 1) * pos_score_user) / (1 - tau_plus), (N_u * temp_e_u))
@@ -390,8 +390,8 @@ class SGL(AbstractRecommender):
             pos_score_item = tf.reduce_sum(input_tensor=tf.multiply(normalize_item_emb1, normalize_item_emb2), axis=1)
             ttl_score_item = tf.matmul(normalize_item_emb1, normalize_all_item_emb2, transpose_a=False, transpose_b=True)
             
-            pos_score_item = tf.exp(pos_score_item)
-            ttl_score_item = tf.reduce_sum(input_tensor=tf.exp(ttl_score_item), axis=1)
+            pos_score_item = tf.exp(pos_score_item / self.ssl_temp)
+            ttl_score_item = tf.reduce_sum(input_tensor=tf.exp(ttl_score_item / self.ssl_temp), axis=1)
             N_i = tf.cast(tf.shape(ttl_score_item)[0] - 1, dtype=tf.float32)
             temp_e_i = tf.exp(tf.constant([-1 / self.ssl_temp]))
             ttl_score_item = tf.maximum((ttl_score_item - (N_i * tau_plus + 1) * pos_score_item) / (1 - tau_plus), (N_i * temp_e_i))
