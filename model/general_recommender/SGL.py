@@ -158,7 +158,7 @@ class SGL(AbstractRecommender):
             self.pos_items = tf.compat.v1.placeholder(tf.int32, shape=(None,))
             self.neg_items = tf.compat.v1.placeholder(tf.int32, shape=(None,))
 
-            # these 'sub_mat' variables are for storing augmented graph data (2 graphs to be exact)
+            # these 'sub_mat' variables are for storing augmented graph structures, i.e., adjacency matrices (2 graphs to be exact)
             self.sub_mat = {}
             if self.aug_type in [0, 1]:
                 self.sub_mat['adj_values_sub1'] = tf.compat.v1.placeholder(tf.float32)
@@ -240,7 +240,7 @@ class SGL(AbstractRecommender):
         self.saver = tf.compat.v1.train.Saver()
 
     def _create_lightgcn_SSL_embed(self):
-        # first, construct operations for the adjacency matrices of the augmented graphs
+        # construct sparse tensors to hold values for sparse adjacency matrices for subgraphs
         for k in range(1, self.n_layers + 1):
             if self.aug_type in [0, 1]:
                 self.sub_mat['sub_mat_1%d' % k] = tf.SparseTensor(
@@ -262,7 +262,7 @@ class SGL(AbstractRecommender):
                     self.sub_mat['adj_shape_sub2%d' % k])
         adj_mat = self._convert_sp_mat_to_sp_tensor(self.norm_adj)
 
-        # [from LightGCN paper]: create embeddings matrix E
+        # [from LightGCN paper]: create embeddings matrix E in R^{|U|+|I| x d}
         ego_embeddings = tf.concat([self.weights['user_embedding'], self.weights['item_embedding']], axis=0)
         ego_embeddings_sub1 = ego_embeddings
         ego_embeddings_sub2 = ego_embeddings
