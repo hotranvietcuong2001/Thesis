@@ -373,7 +373,7 @@ class SGL(AbstractRecommender):
             pos_score_user = tf.exp(pos_score_user)
             # denominator
             ttl_score_user = tf.reduce_sum(input_tensor=tf.exp(ttl_score_user), axis=1)
-            N = tf.shape(ttl_score_user)[0] - 1
+            N = tf.cast(tf.shape(ttl_score_user)[0] - 1, dtype=tf.float32)
             temp_e = tf.exp(tf.constant([-1 / self.ssl_temp]))
             ttl_score_user = tf.maximum((ttl_score_user - (N * tau_plus + 1) * pos_score_user) / (1 - tau_plus), (N * temp_e))
 
@@ -392,7 +392,7 @@ class SGL(AbstractRecommender):
             
             pos_score_item = tf.exp(pos_score_item)
             ttl_score_item = tf.reduce_sum(input_tensor=tf.exp(ttl_score_item), axis=1)
-            N = tf.shape(ttl_score_item)[0] - 1
+            N = tf.cast(tf.shape(ttl_score_item)[0] - 1, dtype=tf.float32)
             temp_e = tf.exp(tf.constant([-1 / self.ssl_temp]))
             ttl_score_item = tf.maximum((ttl_score_item - (N * tau_plus + 1) * pos_score_item) / (1 - tau_plus), (N * temp_e))
 
