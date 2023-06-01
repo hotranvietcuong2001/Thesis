@@ -208,7 +208,7 @@ class SGL(AbstractRecommender):
                 if self.ssl_mode in ['user_side', 'item_side', 'both_side']:
                     # self.ssl_loss = self.calc_ssl_loss()
                     self.ssl_loss = self.calc_ssl_loss_v2()
-                    # self.ssl_loss = self.calc_new_loss()
+                    # self.ssl_loss = self.calc_decoupled_loss()
                 elif self.ssl_mode in ['merge']:
                     self.ssl_loss = self.calc_ssl_loss_v3()
                 else:
@@ -325,42 +325,68 @@ class SGL(AbstractRecommender):
         ssl_loss = self.ssl_reg * (ssl_loss_user + ssl_loss_item)
         return ssl_loss
 
-    def calc_new_loss(self):
+    def calc_decoupled_loss(self):
         if self.ssl_mode in ['user_side', 'both_side']:
             # embedding_lookup no. 0, 1,...
             # these are the selected user embeddings of the two subgraphs that are randomly selected to act as positive pairs sample for ssl loss
             # apparently, user_emb1 is z'_u and user_emb2 is z''_u
-            user_emb1 = tf.nn.embedding_lookup(params=self.ua_embeddings, ids=self.users)
+            user_emb1 = tf.nn.embedding_lookup(params=self.ua_embeddings_sub1, ids=self.users)
             user_emb2 = tf.nn.embedding_lookup(params=self.ua_embeddings_sub2, ids=self.users)
 
             # normalize the embeddings of the pairs
             normalize_user_emb1 = tf.nn.l2_normalize(user_emb1, 1)
             normalize_user_emb2 = tf.nn.l2_normalize(user_emb2, 1)
             # normalize all embeddings for users of subgraph 2
-            # it might not be obvious, but it seems like this matrix is used to sample negative samples z''_v
+            # this matrix is used to sample samples of a different view z''_v
             normalize_all_user_emb2 = tf.nn.l2_normalize(self.ua_embeddings_sub2, 1)
             
             # for ease of read, X and x from now will refer to the normalized embeddings Z, z
-            # this is actually the dot product (i.e. cosine similarity) of positive pair x'_u and x''_u but written like this for some reason
+            # this is actually the dot product (i.e. cosine similarity) of positive pair x'_u and x''_u, written like this to avoid computing for two different users
+            # this returns a vector, where each component v[u] is the dot product of x'_u and x''_u
             pos_score_user = tf.reduce_sum(input_tensor=tf.multiply(normalize_user_emb1, normalize_user_emb2), axis=1)
 
-            # this is the cosine similarity between negative pair x'_u and x''_v
+            # this is the cosine similarity between pairs of different views x'_u and x''_v
             # when written like this, the return value is a matrix M where M[u][v] denotes the similarity between x'_u and x''_v
             ttl_score_user = tf.matmul(normalize_user_emb1, normalize_all_user_emb2, transpose_a=False, transpose_b=True)
 
-            # get the exponentiation of positive score divided by τ
-            pos_score_user = tf.exp(pos_score_user / self.ssl_temp)
-            # calculate the denominator
-            # first, the element-wise exponentiation of the score divided by τ is calculated, then all values along side the u'th row of M will be summed up and then reduced to one dimension
-            ttl_score_user = tf.reduce_sum(input_tensor=tf.exp(ttl_score_user / self.ssl_temp), axis=1)
+            # [from DCL loss paper]: the exponentiation of the following is not needed
+            pos_score_user = pos_score_user / self.ssl_temp
 
-            # divide positive score by the negative score element-wise, then get the log, then finally, get the negative sum of all elements in vector
-            ssl_loss_user = -tf.reduce_sum(input_tensor=tf.math.log(pos_score_user / ttl_score_user))
+            # calculate the denominator
+            # first, the element-wise exponentiation of the score divided by τ is calculated, then all values along the u'th row of M will be summed up and then reduced to one dimension where each component m[u] = sum{exp(< x'_u, x''_v >) | v in U}
+            ttl_score_user = tf.reduce_sum(input_tensor=tf.exp(ttl_score_user / self.ssl_temp), axis=1)
+            # [from DCL loss paper]: the denominator contains only the exponential sum of negative pairs
+            ttl_score_user = ttl_score_user - tf.exp(pos_score_user)
+
+            # [from DCL loss paper]: the numerator is exp(< x'_u, x''_u >), the denominator is sum{exp(< x'_u, x''_v >) | v in U}
+            # => log(exp(< x'_u, x''_u >) / sum{exp(< x'_u, x''_v >) | v in U}) = < x'_u, x''_u > - log(sum{exp(< x'_u, x''_v >) | v in U})
+            ssl_loss_user = -tf.reduce_sum(input_tensor=(pos_score_user - tf.math.log(ttl_score_user)))
         
         # similar to user's side
         if self.ssl_mode in ['item_side', 'both_side']:
-            item_emb1 = tf.nn.embedding_lookup(params=self.ia_embeddings, ids=self.pos_items)
+            item_emb1 = tf.nn.embedding_lookup(params=self.ia_embeddings_sub1, ids=self.pos_items)
             item_emb2 = tf.nn.embedding_lookup(params=self.ia_embeddings_sub2, ids=self.pos_items)
+
+            normalize_item_emb1 = tf.nn.l2_normalize(item_emb1, 1)
+            normalize_item_emb2 = tf.nn.l2_normalize(item_emb2, 1)
+            normalize_all_item_emb2 = tf.nn.l2_normalize(self.ia_embeddings_sub2, 1)
+            pos_score_item = tf.reduce_sum(input_tensor=tf.multiply(normalize_item_emb1, normalize_item_emb2), axis=1)
+            ttl_score_item = tf.matmul(normalize_item_emb1, normalize_all_item_emb2, transpose_a=False, transpose_b=True)
+            
+            pos_score_item = pos_score_item / self.ssl_temp
+            ttl_score_item = tf.reduce_sum(input_tensor=tf.exp(ttl_score_item / self.ssl_temp), axis=1)
+            ttl_score_item = ttl_score_item - tf.exp(pos_score_item)
+
+            ssl_loss_item = -tf.reduce_sum(input_tensor=(pos_score_item - tf.math.log(ttl_score_item)))
+
+        if self.ssl_mode == 'user_side':
+            ssl_loss = self.ssl_reg * ssl_loss_user
+        elif self.ssl_mode == 'item_side':
+            ssl_loss = self.ssl_reg * ssl_loss_item
+        else:
+            ssl_loss = self.ssl_reg * (ssl_loss_user + ssl_loss_item)
+        
+        return ssl_loss
 
     def calc_ssl_loss_v2(self):
         '''
@@ -377,21 +403,22 @@ class SGL(AbstractRecommender):
             normalize_user_emb1 = tf.nn.l2_normalize(user_emb1, 1)
             normalize_user_emb2 = tf.nn.l2_normalize(user_emb2, 1)
             # normalize all embeddings for users of subgraph 2
-            # it might not be obvious, but it seems like this matrix is used to sample negative samples z''_v
+            # this matrix is used to sample samples of a different view z''_v
             normalize_all_user_emb2 = tf.nn.l2_normalize(self.ua_embeddings_sub2, 1)
             
             # for ease of read, X and x from now will refer to the normalized embeddings Z, z
-            # this is actually the dot product (i.e. cosine similarity) of positive pair x'_u and x''_u but written like this for some reason
+            # this is actually the dot product (i.e. cosine similarity) of positive pair x'_u and x''_u, written like this to avoid computing for two different users
+            # this returns a vector, where each component v[u] is the dot product of x'_u and x''_u
             pos_score_user = tf.reduce_sum(input_tensor=tf.multiply(normalize_user_emb1, normalize_user_emb2), axis=1)
 
-            # this is the cosine similarity between negative pair x'_u and x''_v
+            # this is the cosine similarity between pairs of different views x'_u and x''_v
             # when written like this, the return value is a matrix M where M[u][v] denotes the similarity between x'_u and x''_v
             ttl_score_user = tf.matmul(normalize_user_emb1, normalize_all_user_emb2, transpose_a=False, transpose_b=True)
 
             # get the exponentiation of positive score divided by τ
             pos_score_user = tf.exp(pos_score_user / self.ssl_temp)
             # calculate the denominator
-            # first, the element-wise exponentiation of the score divided by τ is calculated, then all values along side the u'th row of M will be summed up and then reduced to one dimension
+            # first, the element-wise exponentiation of the score divided by τ is calculated, then all values along the u'th row of M will be summed up and then reduced to one dimension where each component m[u] = sum{exp(< x'_u, x''_v >) | v in U}
             ttl_score_user = tf.reduce_sum(input_tensor=tf.exp(ttl_score_user / self.ssl_temp), axis=1)
 
             # divide positive score by the negative score element-wise, then get the log, then finally, get the negative sum of all elements in vector
