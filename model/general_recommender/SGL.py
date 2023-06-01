@@ -71,13 +71,21 @@ class SGL(AbstractRecommender):
         self.pretrain = conf["pretrain"]
         # if self.pretrain:
         #    self.epochs = 0
+        self.ssl_loss_type_str = ""
+        if self.ssl_loss_type == 1:
+            self.ssl_loss_type_str = "_dc_loss"
+        elif self.ssl_loss_type == 2:
+            self.ssl_loss_type_str = "_debiased_loss"
+        else:
+            self.ssl_loss_type_str = ""
+        
         self.save_flag = conf["save_flag"]
         if self.pretrain or self.save_flag:
             self.tmp_model_folder = conf["proj_path"] + 'model_tmp/%s/%s/%s/' % (self.dataset_name, self.model_name, self.model_str)
             self.save_folder = conf["proj_path"] + 'dataset/pretrain-embeddings-%s/%s%s/n_layers=%d/' % (
                 self.dataset_name, 
                 self.model_name,
-                "_dc_loss" if self.ssl_loss_type == 1 else "",
+                self.ssl_loss_type_str,
                 self.n_layers)
             tool.ensureDir(self.tmp_model_folder)
             tool.ensureDir(self.save_folder)
@@ -210,10 +218,14 @@ class SGL(AbstractRecommender):
                 if self.ssl_mode in ['user_side', 'item_side', 'both_side']:
                     # self.ssl_loss = self.calc_ssl_loss()
                     if self.ssl_loss_type == 0:
+                        print("Using default loss")
                         self.ssl_loss = self.calc_ssl_loss_v2()
-                    else:
+                    elif self.ssl_loss_type == 1:
                         print("Using decoupled loss")
                         self.ssl_loss = self.calc_decoupled_loss()
+                    else:
+                        print("Using debiased loss")
+                        self.ssl_loss = self.calc_debiased_loss()
                 elif self.ssl_mode in ['merge']:
                     self.ssl_loss = self.calc_ssl_loss_v3()
                 else:
@@ -328,6 +340,71 @@ class SGL(AbstractRecommender):
         ssl_loss_user = -tf.reduce_sum(input_tensor=tf.math.log(pos_score_user / ttl_score_user))
         ssl_loss_item = -tf.reduce_sum(input_tensor=tf.math.log(pos_score_item / ttl_score_item))
         ssl_loss = self.ssl_reg * (ssl_loss_user + ssl_loss_item)
+        return ssl_loss
+    
+    def calc_debiased_loss(self):
+        # Ng = max (( - N * tau_plus * pos + neg ) / (1 - tau_plus ) , N * e **( -1/ t))
+        # debiased_loss = - log ( pos / ( pos + Ng ))
+        tau_plus = 0.2
+        if self.ssl_mode in ['user_side', 'both_side']:
+            # embedding_lookup no. 0, 1,...
+            # these are the selected user embeddings of the two subgraphs that are randomly selected to act as positive pairs sample for ssl loss
+            # apparently, user_emb1 is z'_u and user_emb2 is z''_u
+            user_emb1 = tf.nn.embedding_lookup(params=self.ua_embeddings_sub1, ids=self.users)
+            user_emb2 = tf.nn.embedding_lookup(params=self.ua_embeddings_sub2, ids=self.users)
+
+            # normalize the embeddings of the pairs
+            normalize_user_emb1 = tf.nn.l2_normalize(user_emb1, 1)
+            normalize_user_emb2 = tf.nn.l2_normalize(user_emb2, 1)
+            # normalize all embeddings for users of subgraph 2
+            # this matrix is used to sample samples of a different view z''_v
+            normalize_all_user_emb2 = tf.nn.l2_normalize(self.ua_embeddings_sub2, 1)
+            
+            # for ease of read, X and x from now will refer to the normalized embeddings Z, z
+            # this is actually the dot product (i.e. cosine similarity) of positive pair x'_u and x''_u, written like this to avoid computing for two different users
+            # this returns a vector, where each component v[u] is the dot product of x'_u and x''_u
+            pos_score_user = tf.reduce_sum(input_tensor=tf.multiply(normalize_user_emb1, normalize_user_emb2), axis=1)
+
+            # this is the cosine similarity between pairs of different views x'_u and x''_v
+            # when written like this, the return value is a matrix M where M[u][v] denotes the similarity between x'_u and x''_v
+            ttl_score_user = tf.matmul(normalize_user_emb1, normalize_all_user_emb2, transpose_a=False, transpose_b=True)
+
+            # numerator
+            pos_score_user = tf.exp(pos_score_user)
+            # denominator
+            ttl_score_user = tf.reduce_sum(input_tensor=tf.exp(ttl_score_user), axis=1)
+            N = len(ttl_score_user) - 1.0
+            temp_e = tf.exp(tf.constant([-1 / self.ssl_temp]))
+            ttl_score_user = tf.maximum((ttl_score_user - (N * tau_plus + 1) * pos_score_user) / (1 - tau_plus), (N * temp_e))
+
+            ssl_loss_user = -tf.reduce_sum(input_tensor=tf.math.log(pos_score_user / (pos_score_user + ttl_score_user)))
+        
+        # similar to user's side
+        if self.ssl_mode in ['item_side', 'both_side']:
+            item_emb1 = tf.nn.embedding_lookup(params=self.ia_embeddings_sub1, ids=self.pos_items)
+            item_emb2 = tf.nn.embedding_lookup(params=self.ia_embeddings_sub2, ids=self.pos_items)
+
+            normalize_item_emb1 = tf.nn.l2_normalize(item_emb1, 1)
+            normalize_item_emb2 = tf.nn.l2_normalize(item_emb2, 1)
+            normalize_all_item_emb2 = tf.nn.l2_normalize(self.ia_embeddings_sub2, 1)
+            pos_score_item = tf.reduce_sum(input_tensor=tf.multiply(normalize_item_emb1, normalize_item_emb2), axis=1)
+            ttl_score_item = tf.matmul(normalize_item_emb1, normalize_all_item_emb2, transpose_a=False, transpose_b=True)
+            
+            pos_score_item = tf.exp(pos_score_item)
+            ttl_score_item = tf.reduce_sum(input_tensor=tf.exp(ttl_score_item), axis=1)
+            N = len(ttl_score_item) - 1.0
+            temp_e = tf.exp(tf.constant([-1 / self.ssl_temp]))
+            ttl_score_item = tf.maximum((ttl_score_item - (N * tau_plus + 1) * pos_score_item) / (1 - tau_plus), (N * temp_e))
+
+            ssl_loss_item = -tf.reduce_sum(input_tensor=tf.math.log(pos_score_item / (pos_score_item + ttl_score_item)))
+
+        if self.ssl_mode == 'user_side':
+            ssl_loss = self.ssl_reg * ssl_loss_user
+        elif self.ssl_mode == 'item_side':
+            ssl_loss = self.ssl_reg * ssl_loss_item
+        else:
+            ssl_loss = self.ssl_reg * (ssl_loss_user + ssl_loss_item)
+        
         return ssl_loss
 
     def calc_decoupled_loss(self):
