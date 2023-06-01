@@ -207,8 +207,8 @@ class SGL(AbstractRecommender):
             else:
                 if self.ssl_mode in ['user_side', 'item_side', 'both_side']:
                     # self.ssl_loss = self.calc_ssl_loss()
-                    self.ssl_loss = self.calc_ssl_loss_v2()
-                    # self.ssl_loss = self.calc_decoupled_loss()
+                    # self.ssl_loss = self.calc_ssl_loss_v2()
+                    self.ssl_loss = self.calc_decoupled_loss()
                 elif self.ssl_mode in ['merge']:
                     self.ssl_loss = self.calc_ssl_loss_v3()
                 else:
