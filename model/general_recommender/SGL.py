@@ -45,6 +45,9 @@ class SGL(AbstractRecommender):
         self.ssl_ratio = conf["ssl_ratio"]
         self.ssl_temp = conf["ssl_temp"]
         self.ssl_reg = conf["ssl_reg"]
+        self.ssl_loss_type = conf["ssl_loss_type"]
+        print(self.ssl_loss_type)
+        exit()
 
         self.dataset = dataset
         self.n_users, self.n_items = self.dataset.num_users, self.dataset.num_items
