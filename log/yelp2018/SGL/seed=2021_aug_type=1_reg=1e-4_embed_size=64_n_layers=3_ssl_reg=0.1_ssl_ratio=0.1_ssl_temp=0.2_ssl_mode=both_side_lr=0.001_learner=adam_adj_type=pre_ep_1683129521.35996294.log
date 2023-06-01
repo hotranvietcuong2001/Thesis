@@ -1,0 +1,81 @@
+2023-05-03 22:58:41.360: Dataset name: yelp2018
+The number of users: 31668
+The number of items: 38048
+The number of ratings: 1561406
+Average actions of users: 49.31
+Average actions of items: 41.04
+The sparsity of the dataset: 99.870412%
+2023-05-03 22:58:41.360: 
+
+NeuRec hyperparameters:
+recommender=SGL
+config_dir=./conf
+gpu_id=1
+gpu_mem=0.5
+data.input.path=dataset
+data.input.dataset=yelp2018
+data.column.format=UI
+data.convert.separator=','
+user_min=0
+item_min=0
+splitter=given
+ratio=0.8
+by_time=False
+metric=["Precision", "Recall", "NDCG", "MAP", "MRR"]
+topk=[20]
+group_view=None
+rec.evaluate.neg=0
+test_batch_size=128
+num_thread=8
+start_testing_epoch=0
+proj_path=./
+
+SGL's hyperparameters:
+seed=2021
+aug_type=1
+reg=1e-4
+embed_size=64
+n_layers=3
+ssl_reg=0.1
+ssl_ratio=0.1
+ssl_temp=0.2
+ssl_mode=both_side
+lr=0.001
+learner=adam
+adj_type=pre
+epochs=5
+batch_size=2048
+num_negatives=1
+init_method=xavier_uniform
+stddev=0.01
+verbose=1
+stop_cnt=50
+pretrain=1
+save_flag=1
+
+2023-05-03 22:58:44.854: metrics:	Precision@20	Recall@20   	NDCG@20     	MAP@20      	MRR@20      
+2023-05-03 22:58:52.843: 		0.02067379  	0.04476311  	0.03610103  	0.06779350  	0.07489831  
+2023-05-03 22:59:52.561: [iter 1 : loss : 0.0872 = 0.0856 + 0.0000 + 0.0016, time: 56.822804]
+2023-05-03 23:00:00.191: epoch 1:	0.02114578  	0.04582784  	0.03699962  	0.06948621  	0.07678948  
+2023-05-03 23:00:00.191: Found a better model.
+2023-05-03 23:00:00.191: Save model to file as pretrain.
+2023-05-03 23:01:01.216: [iter 2 : loss : 0.0818 = 0.0801 + 0.0000 + 0.0017, time: 57.755793]
+2023-05-03 23:01:08.876: epoch 2:	0.02153728  	0.04677486  	0.03771253  	0.07085259  	0.07812512  
+2023-05-03 23:01:08.876: Found a better model.
+2023-05-03 23:01:08.876: Save model to file as pretrain.
+2023-05-03 23:02:08.390: [iter 3 : loss : 0.0779 = 0.0761 + 0.0000 + 0.0018, time: 56.237787]
+2023-05-03 23:02:15.686: epoch 3:	0.02181512  	0.04748954  	0.03829492  	0.07196765  	0.07941517  
+2023-05-03 23:02:15.687: Found a better model.
+2023-05-03 23:02:15.687: Save model to file as pretrain.
+2023-05-03 23:03:16.930: [iter 4 : loss : 0.0746 = 0.0728 + 0.0000 + 0.0019, time: 57.984841]
+2023-05-03 23:03:23.915: epoch 4:	0.02210399  	0.04820073  	0.03880141  	0.07278063  	0.08034717  
+2023-05-03 23:03:23.915: Found a better model.
+2023-05-03 23:03:23.915: Save model to file as pretrain.
+2023-05-03 23:04:23.903: [iter 5 : loss : 0.0709 = 0.0689 + 0.0000 + 0.0020, time: 56.693256]
+2023-05-03 23:04:31.630: epoch 5:	0.02221291  	0.04850223  	0.03919857  	0.07377946  	0.08156340  
+2023-05-03 23:04:31.630: Found a better model.
+2023-05-03 23:04:31.631: Save model to file as pretrain.
+2023-05-03 23:04:32.023: best_result@epoch 5:
+
+2023-05-03 23:04:32.023: Loading from the saved model.
+2023-05-03 23:04:38.947: 		0.02221291  	0.04850223  	0.03919857  	0.07377946  	0.08156340  

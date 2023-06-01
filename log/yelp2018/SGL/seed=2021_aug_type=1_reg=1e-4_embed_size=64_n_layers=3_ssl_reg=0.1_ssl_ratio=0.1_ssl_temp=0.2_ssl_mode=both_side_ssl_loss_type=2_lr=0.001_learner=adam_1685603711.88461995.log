@@ -1,0 +1,66 @@
+2023-06-01 14:15:11.884: Dataset name: yelp2018
+The number of users: 31668
+The number of items: 38048
+The number of ratings: 1561406
+Average actions of users: 49.31
+Average actions of items: 41.04
+The sparsity of the dataset: 99.870412%
+2023-06-01 14:15:11.884: 
+
+NeuRec hyperparameters:
+recommender=SGL
+config_dir=./conf
+gpu_id=1
+gpu_mem=0.5
+data.input.path=dataset
+data.input.dataset=yelp2018
+data.column.format=UI
+data.convert.separator=','
+user_min=0
+item_min=0
+splitter=given
+ratio=0.8
+by_time=False
+metric=["Precision", "Recall", "NDCG", "MAP", "MRR"]
+topk=[20]
+group_view=None
+rec.evaluate.neg=0
+test_batch_size=128
+num_thread=8
+start_testing_epoch=0
+proj_path=./
+
+SGL's hyperparameters:
+seed=2021
+aug_type=1
+reg=1e-4
+embed_size=64
+n_layers=3
+ssl_reg=0.1
+ssl_ratio=0.1
+ssl_temp=0.2
+ssl_mode=both_side
+ssl_loss_type=2
+lr=0.001
+learner=adam
+adj_type=pre
+epochs=1000
+batch_size=2048
+num_negatives=1
+init_method=xavier_uniform
+stddev=0.01
+verbose=1
+stop_cnt=50
+pretrain=0
+save_flag=1
+
+2023-06-01 14:15:15.525: metrics:	Precision@20	Recall@20   	NDCG@20     	MAP@20      	MRR@20      
+2023-06-01 14:15:19.711: 		0.00030946  	0.00059072  	0.00045140  	0.00103730  	0.00103707  
+2023-06-01 14:16:59.026: [iter 1 : loss : 2.6209 = 0.6930 + 1.9279 + 0.0000, time: 96.433758]
+2023-06-01 14:17:03.259: epoch 1:	0.00414778  	0.00916798  	0.00698786  	0.01269811  	0.01379047  
+2023-06-01 14:17:03.259: Found a better model.
+2023-06-01 14:17:03.259: Save model to file as pretrain.
+2023-06-01 14:18:35.592: [iter 2 : loss : 2.6073 = 0.6797 + 1.9276 + 0.0000, time: 89.080952]
+2023-06-01 14:18:39.631: epoch 2:	0.00739881  	0.01585539  	0.01286640  	0.02317919  	0.02638305  
+2023-06-01 14:18:39.631: Found a better model.
+2023-06-01 14:18:39.631: Save model to file as pretrain.
