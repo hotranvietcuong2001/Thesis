@@ -212,7 +212,7 @@ class SGL(AbstractRecommender):
         Generate Predictions & Optimize via BPR loss.
         """
         with tf.compat.v1.name_scope("loss"):
-            if self.pretrain:
+            if self.pretrain and self.ssl_loss_type == 0:
                 self.ssl_loss = tf.constant(0, dtype=tf.float32)
             else:
                 if self.ssl_mode in ['user_side', 'item_side', 'both_side']:
