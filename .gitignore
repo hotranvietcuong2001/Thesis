@@ -1,3 +1,4 @@
 .vscode
 output/
 dataset/pretrain-embeddings*
+dataset/_tmp_*
