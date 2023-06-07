@@ -1,0 +1,133 @@
+seed= 2021
+split and save data...
+2023-06-07 02:30:26.402: amazon-book_given_u0_i0
+2023-06-07 02:30:26.402: Dataset name: amazon-book
+The number of users: 52643
+The number of items: 91599
+The number of ratings: 2984108
+Average actions of users: 56.69
+Average actions of items: 32.58
+The sparsity of the dataset: 99.938115%
+Item degree grouping...
+User degree grouping...
+Data loading finished
+Evaluate model with cpp
+2023-06-07 02:30:36.103: Dataset name: amazon-book
+The number of users: 52643
+The number of items: 91599
+The number of ratings: 2984108
+Average actions of users: 56.69
+Average actions of items: 32.58
+The sparsity of the dataset: 99.938115%
+2023-06-07 02:30:36.103: 
+
+NeuRec hyperparameters:
+recommender=SGL
+config_dir=./conf
+gpu_id=0
+gpu_mem=1.0
+data.input.path=dataset
+data.input.dataset=amazon-book
+data.column.format=UI
+data.convert.separator=','
+user_min=0
+item_min=0
+splitter=given
+ratio=0.8
+by_time=False
+metric=["Precision", "Recall", "NDCG", "MAP", "MRR"]
+topk=[20]
+group_view=None
+rec.evaluate.neg=0
+test_batch_size=128
+num_thread=8
+start_testing_epoch=0
+proj_path=./
+
+SGL's hyperparameters:
+seed=2021
+aug_type=2
+reg=1e-4
+embed_size=64
+n_layers=3
+ssl_reg=0.5
+ssl_ratio=0.1
+ssl_temp=0.2
+ssl_mode=both_side
+ssl_loss_type=2
+lr=0.001
+learner=adam
+adj_type=pre
+epochs=1000
+batch_size=2048
+num_negatives=1
+init_method=xavier_uniform
+stddev=0.01
+verbose=1
+stop_cnt=30
+pretrain=0
+save_flag=1
+
+Using debiased loss
+2023-06-07 02:30:46.867: metrics:	Precision@20	Recall@20   	NDCG@20     	MAP@20      	MRR@20      
+2023-06-07 02:31:22.377: 		0.00012348  	0.00020892  	0.00017958  	0.00043430  	0.00043419  
+2023-06-07 02:50:14.415: [iter 1 : loss : 7.0003 = 0.6930 + 6.3072 + 0.0000, time: 1103.826413]
+2023-06-07 02:50:45.421: epoch 1:	0.00268531  	0.00577663  	0.00468823  	0.00871913  	0.00951691  
+2023-06-07 02:50:45.422: Found a better model.
+2023-06-07 02:50:45.422: Save model to file as pretrain.
+2023-06-07 03:08:52.182: [iter 2 : loss : 6.9899 = 0.6928 + 6.2971 + 0.0000, time: 1054.580949]
+2023-06-07 03:09:24.131: epoch 2:	0.00341009  	0.00744334  	0.00593714  	0.01112142  	0.01180434  
+2023-06-07 03:09:24.134: Found a better model.
+2023-06-07 03:09:24.134: Save model to file as pretrain.
+2023-06-07 03:27:23.838: [iter 3 : loss : 6.9885 = 0.6925 + 6.2959 + 0.0000, time: 1051.856101]
+2023-06-07 03:27:53.168: epoch 3:	0.00389549  	0.00875500  	0.00706126  	0.01300408  	0.01408249  
+2023-06-07 03:27:53.169: Found a better model.
+2023-06-07 03:27:53.169: Save model to file as pretrain.
+2023-06-07 03:46:05.760: [iter 4 : loss : 6.9873 = 0.6920 + 6.2952 + 0.0000, time: 1065.501793]
+2023-06-07 03:46:36.541: epoch 4:	0.00401233  	0.00920235  	0.00734866  	0.01346437  	0.01457260  
+2023-06-07 03:46:36.543: Found a better model.
+2023-06-07 03:46:36.543: Save model to file as pretrain.
+2023-06-07 04:04:43.854: [iter 5 : loss : 6.9861 = 0.6912 + 6.2949 + 0.0000, time: 1055.620538]
+2023-06-07 04:05:13.930: epoch 5:	0.00272521  	0.00650347  	0.00496469  	0.00810221  	0.00885051  
+2023-06-07 04:23:32.274: [iter 6 : loss : 6.9842 = 0.6893 + 6.2948 + 0.0000, time: 1071.345598]
+2023-06-07 04:24:03.520: epoch 6:	0.00142195  	0.00341654  	0.00270626  	0.00389681  	0.00434719  
+2023-06-07 04:42:01.425: [iter 7 : loss : 6.9799 = 0.6845 + 6.2954 + 0.0000, time: 1052.155985]
+2023-06-07 04:42:31.633: epoch 7:	0.00192159  	0.00460107  	0.00367761  	0.00526440  	0.00593207  
+2023-06-07 05:00:44.717: [iter 8 : loss : 6.9669 = 0.6691 + 6.2976 + 0.0001, time: 1066.175330]
+2023-06-07 05:01:14.698: epoch 8:	0.00371878  	0.00914789  	0.00726983  	0.01092233  	0.01225494  
+2023-06-07 05:19:35.174: [iter 9 : loss : 6.9266 = 0.6233 + 6.3031 + 0.0002, time: 1073.912214]
+2023-06-07 05:20:05.090: epoch 9:	0.00721888  	0.01740237  	0.01422729  	0.02352340  	0.02597694  
+2023-06-07 05:20:05.090: Found a better model.
+2023-06-07 05:20:05.090: Save model to file as pretrain.
+2023-06-07 05:38:08.277: [iter 10 : loss : 6.8443 = 0.5320 + 6.3117 + 0.0006, time: 1056.275377]
+2023-06-07 05:38:39.552: epoch 10:	0.01326783  	0.03169159  	0.02612391  	0.04564583  	0.05044983  
+2023-06-07 05:38:39.552: Found a better model.
+2023-06-07 05:38:39.552: Save model to file as pretrain.
+2023-06-07 05:56:57.280: [iter 11 : loss : 6.7257 = 0.4026 + 6.3220 + 0.0011, time: 1070.492667]
+2023-06-07 05:57:26.869: epoch 11:	0.01768877  	0.04170410  	0.03404287  	0.05935517  	0.06588197  
+2023-06-07 05:57:26.870: Found a better model.
+2023-06-07 05:57:26.870: Save model to file as pretrain.
+2023-06-07 06:15:44.686: [iter 12 : loss : 6.6163 = 0.2863 + 6.3282 + 0.0019, time: 1068.891915]
+2023-06-07 06:16:14.510: epoch 12:	0.01942199  	0.04588580  	0.03713062  	0.06444726  	0.07139353  
+2023-06-07 06:16:14.510: Found a better model.
+2023-06-07 06:16:14.511: Save model to file as pretrain.
+2023-06-07 06:34:45.186: [iter 13 : loss : 6.5363 = 0.2049 + 6.3289 + 0.0026, time: 1082.397408]
+2023-06-07 06:35:14.855: epoch 13:	0.01992458  	0.04748351  	0.03811361  	0.06573763  	0.07281975  
+2023-06-07 06:35:14.856: Found a better model.
+2023-06-07 06:35:14.856: Save model to file as pretrain.
+2023-06-07 06:53:35.515: [iter 14 : loss : 6.4817 = 0.1519 + 6.3265 + 0.0033, time: 1073.414545]
+2023-06-07 06:54:06.973: epoch 14:	0.02008801  	0.04811201  	0.03846192  	0.06632149  	0.07328491  
+2023-06-07 06:54:06.973: Found a better model.
+2023-06-07 06:54:06.974: Save model to file as pretrain.
+2023-06-07 07:12:37.088: [iter 15 : loss : 6.4441 = 0.1168 + 6.3233 + 0.0040, time: 1077.938603]
+2023-06-07 07:13:10.439: epoch 15:	0.02012790  	0.04832745  	0.03850111  	0.06620927  	0.07309412  
+2023-06-07 07:13:10.439: Found a better model.
+2023-06-07 07:13:10.439: Save model to file as pretrain.
+2023-06-07 07:31:05.132: [iter 16 : loss : 6.4166 = 0.0923 + 6.3197 + 0.0046, time: 1048.422667]
+2023-06-07 07:31:34.825: epoch 16:	0.02004046  	0.04828362  	0.03836576  	0.06610598  	0.07265147  
+2023-06-07 07:49:52.110: [iter 17 : loss : 6.3975 = 0.0754 + 6.3169 + 0.0052, time: 1070.496255]
+2023-06-07 07:50:21.932: epoch 17:	0.01985988  	0.04801218  	0.03805974  	0.06555577  	0.07195281  
+2023-06-07 08:08:15.513: [iter 18 : loss : 6.3830 = 0.0630 + 6.3144 + 0.0057, time: 1047.124937]
+2023-06-07 08:08:45.008: epoch 18:	0.01968976  	0.04768018  	0.03779959  	0.06536397  	0.07162253  
+2023-06-07 08:27:03.559: [iter 19 : loss : 6.3719 = 0.0536 + 6.3121 + 0.0062, time: 1071.899133]
+2023-06-07 08:27:33.802: epoch 19:	0.01956337  	0.04740175  	0.03758040  	0.06504434  	0.07123678
