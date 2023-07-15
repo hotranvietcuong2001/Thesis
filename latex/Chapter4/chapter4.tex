@@ -1,0 +1,172 @@
+\chapter{Các kết quả thí nghiệm}
+\label{Chapter4}
+
+\noindent Trong chương này, nhóm nghiên cứu sẽ trình bày các thiết lập ban đầu và kết quả thí nghiệm mà nhóm đã cài đặt và thu được dựa trên các bài báo đã nghiên cứu. Bộ dữ liệu được sử dụng sẽ là những bộ dữ liệu thường được sử dụng để kiểm chứng hiệu quả mà các phương pháp áp dụng lên mô hình gợi ý hiện nay thường dùng. Ngoài tái hiện, kiểm chứng kết quả của bài báo gốc, nhóm cũng tiến hành thêm một vài thí nghiệm nhằm thử nghiệm cải tiến mô hình được đề xuất với mục đích nhằm giảm tác động tiêu cực của các hạn chế mà bài báo gốc vẫn chưa giải quyết được. Cùng với đó, nhóm sẽ phân tích, nhận xét các kết quả đạt được và so sánh với các mô hình học đi trước.
+
+\section{Môi trường thí nghiệm và thiết lập thí nghiệm}
+
+\subsection{Dữ liệu thí nghiệm}
+
+\subsubsection{Mô tả}
+\noindent Nhóm sẽ tiến hành cài đặt, thử nghiệm độ hiệu quả của mô hình vừa tìm hiểu được. Nhóm đã chọn ra 3 bộ dữ liệu \textbf{Yelp2018}, \textbf{Amazon Book}, \textbf{iFashion}, đây là những bộ dữ liệu có độ phổ biến cao (hay được sử dụng dùng để chứng minh kết quả) của hệ thống gợi ý để đánh giá kết quả thu được.
+\begin{itemize}
+    \item[] \textbf{Yelp2018}: Bộ dữ liệu được trích ra từ cuộc thi yelp năm 2018, trong đó các doanh nghiệp tại địa phương như nhà hàng, quán bar... được đánh giá và xem như là các ``sản phẩm''.
+
+    \item[] \textbf{Amazon Book}: Được trích từ tập dữ liệu đánh giá Amazon-review. Amazon Book chứa thông tin đánh giá của người dùng với các sản phẩm sách của Amazon từ năm 1996 đến 2014.
+
+    \item[] \textbf{iFashion}: Bộ dữ liệu công khai của nền tảng iFashion của Taobao (Alibaba Group), gồm các sản phẩm thời trang, các trang bán hàng online và đánh giá, tương tác của người dùng.
+\end{itemize}
+Cả 3 đều gặp phải chung một vấn đề là rất thưa. Thông tin cụ thể của từng bộ dữ liệu về số lượng người dùng/sản phẩm, số lượng tương tác sẽ được mô tả như sau:
+
+\begin{table}[H]
+    \centering
+    \renewcommand{\arraystretch}{1.1}
+    \begin{tabular}{l|r|r|r|r}
+        \hhline{-----}
+        Bộ dữ liệu  & Người dùng & Sản phẩm & Tương tác & Độ thưa thớt \\
+        \hhline{=====}
+        Yelp2018    & 31,668 & 38,048 & 1,561,406 & 99.870412\% \\
+        Amazon Book & 52,643 & 91,599 & 2,984,108 & 99.938115\% \\
+        iFashion    & 300,000 & 81,614 & 1,607,813 & 99.993433\% \\
+        \hhline{-----}
+    \end{tabular}
+    \caption[Mô tả ba bộ dữ liệu.]{Mô tả ba bộ dữ liệu. Độ thưa thớt được tính theo công thức $1 - \frac{\text{Số tương tác}}{\text{Số người dùng} \; \times \; \text{Số sản phẩm}}$.}
+\end{table}
+
+\subsubsection{Chia dữ liệu huấn luyện -- kiểm thử}
+\noindent Với mỗi bộ dữ liệu, ta chia thành hai tập huấn luyện và kiểm thử bằng cách rút ra ngẫu nhiên 80\% số lượng tương tác để xây dựng ma trận tương tác cho tác vụ huấn luyện, phần còn lại sẽ được dùng để kiểm thử. Để kiểm thử thì ta chỉ cần đưa ra dự đoán cho các tương tác giá trị bằng 0 trong ma trận tương tác 80\% đó, và đối chiếu với tập kiểm thử. Chi tiết về độ đo sẽ được nói ở phần sau.
+
+\subsection{Thiết lập huấn luyện -- kiểm thử}
+
+\subsubsection{Môi trường chạy}
+\noindent Nền tảng chạy thử nghiệm là máy tính với cấu hình Intel Core i7-9700K CPU @ 3.60GHz, Nvidia GeForce RTX 2080Ti GPU (12GB VRAM), bộ nhớ RAM 64GB. Model được cài đặt sử dụng thư viện TensorFlow.
+
+\subsubsection{Độ đo}
+\noindent Với danh sách điểm ranking cá nhân mỗi người dùng, ta gợi ý cho họ một số sản phẩm với điểm ranking cao nhất. Phương pháp gợi ý này gọi là top-\textit{K} \cite{generic-top-N} (\textit{K} là số lượng sản phẩm gợi ý). Để đánh giá chất lượng gợi ý \textit{K} sản phẩm cho người dùng, ta sẽ dùng hai độ đo Recall@\textit{K} và NDCG@\textit{K} (\textit{Normalized discounted cumulative gain}). Đây là hai độ đo phổ biến nhất cho hệ thống gợi ý \textit{K} sản phẩm. Hai độ đo này sẽ được tính trên tập kiểm thử cho mỗi người dùng và lấy trung bình.
+
+Với Recall@\textit{K}, ta có công thức tính sau cho mỗi người dùng:
+\begin{equation}
+    \text{Recall@}K = \frac{\textit{truePositives}}{\textit{truePositives} + \textit{falseNegatives}},
+\end{equation}
+trong đó, \textit{truePositives} là số lượng sản phẩm gợi ý đúng trong số \textit{K} sản phẩm được dự đoán, tức là trong tập kiểm thử, người dùng có tương tác với những sản phẩm đó; \textit{falseNegatives} là số lượng sản phẩm mà người dùng có tương tác trong tập kiểm thử nhưng lại không nằm trong tập \textit{K} sản phẩm được gợi ý.
+
+Đối với NDCG@\textit{K}, ta tính như sau với mỗi người dùng, giả sử tập \textit{K} sản phẩm đã được sắp xếp giảm dần theo ranking:
+\begin{equation}
+    \begin{aligned}
+        \text{DCG@}K & = \sum_{i = 1}^{K}{\frac{\textit{rel}_i}{\log_2(i + 1)}}, \\
+        \text{IDCG@}K & = \sum_{i^\ast = 1}^{|\text{REL}_K|}{\frac{\textit{rel}_{i^\ast}}{\log_2(i^\ast + 1)}}, \\
+        \text{NDCG@}K & = \frac{\text{DCG@}K}{\text{IDCG@}K},
+    \end{aligned}
+\end{equation}
+trong đó, $\textit{rel}_i$ là điểm ``relevance'' của sản phẩm thứ $i$ trong tập \textit{K}; $\text{REL}_K$ là tập gồm \textit{K} sản phẩm mà có điểm relevance cao nhất trong tập kiểm thử, được sắp xếp giảm dần theo điểm relevance, và $\textit{rel}_{i^\ast}$ là điểm relevance của sản phẩm thứ $i$ trong tập $\text{REL}_K$. Relevance hiểu nôm na là giá trị của nhãn. Trong ngữ cảnh hệ thống gợi ý trên ma trận tương tác, $\textit{rel}_i \in \{0, 1\}$ đại diện cho việc có tồn tại tương tác giữa người dùng với sản phẩm hay không. Nói cách khác, giả sử ta đang tính NDCG@\textit{K} cho người dùng $u$, $\textit{rel}_i = 1$ nếu $u$ có tương tác với $i$, $\textit{rel}_i = 0$ nếu ngược lại. Để thử nghiệm kết quả dự đoán, ta sẽ đặt $K = 20$.
+
+\subsubsection{Hyperparameter}
+\noindent Đối với model học gợi ý LightGCN, ta sẽ chọn số lượng lớp học sâu là 3. Theo các tác giả của LightGCN \cite{LightGCN}, việc tăng số lớp sẽ giúp tăng khả năng dự đoán của model, tuy nhiên số lớp càng lớn thì lượng tăng càng không đáng kể, ngoài ra còn giảm tốc độ học của model. Vì vậy, ta chọn giá trị tối ưu nhất về mặt hiệu suất và thời gian là 3. Ngoài ra ta chọn số chiều embedding $d = 64$ và regularization $\lambda_2 = 0.0001$. Các tham số $\lambda_1$, $\tau$, và xác suất dropout $\rho$ (tăng cường dữ liệu) đối với hàm mất mát nfoNCE đã được Wu \cite{SGL} thử nghiệm và tìm ra giá trị tối ưu cho mỗi bộ dữ liệu. Nhóm quyết định sử dụng lại các tham số đó và không thử nghiệm thêm vì lí do giới hạn thời gian. Với hàm mất mát Decoupled, ta không thay đổi gì nhiều so với InfoNCE nên quyết định giữ lại các tham số tối ưu đó. Riêng với hàm mất mát Debiased, vì dữ liệu rất thưa nên nhóm thử nghiệm tham số $\tau^+$ với hai giá trị $\{0.01, 0.1\}$, thử nghiệm tham số $t$ với hai giá trị $\{0.1, 0.2\}$ và thấy $\tau^+ = 0.01$ và $t = 0.1$ đưa ra kết quả đủ tốt. Model được huấn luyện sử dụng Optimizer Adam với learning rate 0.001 với batch size là 2048, riêng với bộ dữ liệu iFashion thì sẽ chọn batch size 1024 vì lí do giới hạn bộ nhớ GPU.
+
+\section{Kết quả}
+
+\subsection{So sánh với SGL}
+\noindent Như đã đề cập, ta theo ý tưởng chính của model SGL \cite{SGL} của Wu và đồng nghiệp. Đề tài này sẽ so sánh kết quả chạy theo cài đặt của Wu với cài đặt của nhóm nghiên cứu. Ngoài sử dụng hàm mất mát InfoNCE mà Wu đã cài đặt, khóa luận còn tiến hành cài đặt thêm hai hàm mất mát là Decoupled và Debiased để so sánh kết quả.
+
+\begin{table}[H]
+    \centering
+    \small
+    \begin{tabular}{c|c|l|l|l|l|l|l}
+        \hhline{--------}
+        \multicolumn{2}{c|}{Bộ dữ liệu} & \multicolumn{2}{c|}{Yelp2018} & \multicolumn{2}{c|}{Amazon Book} & \multicolumn{2}{c}{iFashion} \\
+        \hhline{--------}
+         & \multicolumn{1}{c|}{Aug\tablefootnote{Phương pháp tăng cường; ND: Node dropout, ED: Edge dropout, RW: Random walk.}} & \multicolumn{1}{c|}{Recall} & \multicolumn{1}{c|}{NDCG} &  \multicolumn{1}{c|}{Recall} & \multicolumn{1}{c|}{NDCG} &  \multicolumn{1}{c|}{Recall} & \multicolumn{1}{c}{NDCG} \\
+        \hhline{--------}
+        % \hhline{========}
+        \multirow{3}*{SGL (InfoNCE)}
+        & ND & 0.0644 & 0.0528 & 0.0440 & 0.0346 & 0.1126 & 0.0536 \\
+        & ED & \textcolor{orange}{\textbf{0.0675}} & \textcolor{orange}{\textbf{0.0555}} & \textcolor{orange}{\textbf{0.0478}} & \textcolor{orange}{\textbf{0.0379}} & 0.1126 & 0.0538 \\
+        & RW & 0.0667 & 0.0547 & 0.0457 & 0.0356 & \textcolor{orange}{\textbf{0.1139}} & \textcolor{orange}{\textbf{0.0539}} \\
+        \hhline{========}
+        \multirow{3}*{Nhóm -- InfoNCE}
+        & ND & 0.0621 & 0.0513 & 0.0390 & 0.0311 & 0.1071 & 0.0505 \\
+        & ED & 0.0644 & 0.0525 & 0.0474 & 0.0376 & 0.1085 & 0.0513 \\
+        & RW & 0.0674 & 0.0554 & 0.0481 & 0.0383 & 0.1071 & 0.0508 \\
+        \hhline{--------}
+        \multirow{3}*{Nhóm -- Decoupled}
+        & ND & 0.0622 & 0.0515 & 0.0388 & 0.0310 & 0.1081 & 0.0511 \\
+        & ED & 0.0668 & 0.0551 & 0.0475 & 0.0377 & \textcolor{green}{\textbf{0.1095}} & \textcolor{green}{\textbf{0.0517}} \\
+        & RW & 0.0678 & 0.0557 & 0.0481 & 0.0380 & 0.1080 & 0.0512 \\
+        \hhline{--------}
+        \multirow{3}*{Nhóm -- Debiased}
+        & ND & 0.0625 & 0.0514 & 0.0380 & 0.0306 & 0.1081 & 0.0511 \\
+        & ED & \textcolor{green}{\textbf{0.0679}} & \textcolor{green}{\textbf{0.0557}} & 0.0476 & 0.0376 & 0.1094 & 0.0516 \\
+        & RW & 0.0676 & 0.0556 & \textcolor{green}{\textbf{0.0483}} & \textcolor{green}{\textbf{0.0385}} & 0.1085 & 0.0513 \\
+        \hhline{--------}
+    \end{tabular}
+    \caption[Kết quả chạy so với SGL.]{Kết quả chạy cài đặt của nhóm so với cài đặt của Wu và đồng nghiệp. Số liệu \textcolor{orange}{\textbf{màu cam}} là kết quả tốt nhất của SGL, \textcolor{green}{\textbf{màu xanh}} là kết quả chạy tốt nhất của nhóm cài đặt.}
+\end{table}
+
+Có thể thấy các kết quả chạy của cài đặt theo ý tưởng SGL của nhóm khi dùng InfoNCE thì dao động xung quanh kết quả cài đặt của tác giả, riêng ở bộ dữ liệu iFashion thì kết quả thấp hơn một chút. Khi so sánh các kết quả ba cài đặt hàm mất mát cho việc Học tương phản khác nhau mà đề tài thực hiện thì ít nhất một trong hai hàm Decoupled và Debiased đều cho ra kết quả cao hơn InfoNCE. Mặc dù lượng tăng so với InfoNCE là nhỏ, nhưng điều này cho thấy tiềm năng của việc cải tiến hơn nữa về Học tự giám sát nói chung và Học tương phản nói riêng trong tương lai.
+
+Dựa vào kết quả chạy, cách tiếp cận tăng cường Node dropout cho ra kết quả thấp nhất, Edge dropout và Random walk cho ra kết quả tốt nhất.
+\begin{itemize}
+    \item Kết quả của Node dropout thấp hơn có thể là do việc bỏ đi các node gây cản trở việc học Contrastive learning cho những node đó.
+
+    \item Có vẻ như với tập dữ liệu iFashion, Edge dropout cho ra kết quả tốt hơn so với hai loại tăng cường còn lại. Đối với hai bộ dữ liệu Yelp2018 và Amazon Book thì có lợi từ Random walk hơn là Edge dropout, chỉ có ngoại lệ là cài đặt hàm mất mát Debiased chạy trên Yelp2018 với Edge dropout là lớn hơn một chút so với Random walk.
+
+    \item Xét đa phần các trường hợp thì Random walk có kết quả cao hơn Edge dropout có thể là do Random walk bảo toàn cấu trúc cục bộ nhiều hơn là Edge dropout, riêng với bộ dữ liệu iFashion thì có thể là do dữ liệu thưa hơn nhiều so với hai bộ dữ liệu còn lại (số lượng tương tác trung bình mỗi người dùng/sản phẩm thấp) nên Random walk vẫn chưa ổn định lắm.
+\end{itemize}
+
+Để củng cố cho những luận điểm trên, ta có thể tiến hành thêm một vài phép phân tích dựa trên các hình ảnh trực quan.
+\begin{itemize}
+    \item[(1)] Chứng minh hiệu quả mang lại của các hàm mất mát cải tiến: trên mỗi tập dữ liệu, ta sẽ lấy trung bình các kết quả ứng với ba loại hàm mất mát khác nhau.
+    
+    \item[(2)] Đánh giá mức độ hiệu quả mà mỗi phương pháp tăng cường mang lại: trên mỗi tập dữ liệu, ta sẽ lấy trung bình các kết quả ứng với ba loại tăng cường khác nhau. 
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \hspace*{-13mm}
+    \includesvg[width=1.2\linewidth]{images/Chapter4/contrastive-loss.svg}
+    \caption{So sánh kết quả thực nghiệm với ba hàm lỗi áp dụng cho việc Học tương phản.}
+\end{figure}
+
+Ta có thể rút ra kết luận rằng, hai hàm mất mát Debiased và Decoupled đã khắc phục được những hạn chế của cách cài đặt sử dụng hàm InfoNCE. Điều này đã được chứng tỏ qua thực nghiệm trên 3 bộ dữ liệu, đa phần kết quả đến từ hai hàm mất mát cải tiến đều cho hiệu quả vượt trội, riêng ở bộ dữ liệu Amazon, điều này chưa được thể hiện rõ, tuy nhiên sự chênh lệch là không đáng kể và chấp nhận được.
+
+\begin{figure}[H]
+    \centering
+    \hspace*{-13mm}
+    \includesvg[width=1.2\linewidth]{images/Chapter4/aug.svg}
+    \caption{So sánh kết quả thực nghiệm với ba phương pháp tăng cường khác nhau cho đồ thị.}
+\end{figure}
+
+Dựa vào hình trên, càng củng cố thêm nhận định về tính hiệu quả mà các phương pháp tăng cường khác nhau mang lại. Random walk mang lại hiệu quả tốt hơn khi đem so sánh với các phương pháp tăng cường khác dù chưa thực sự ổn định.
+
+Để phân tích tính hiệu quả của việc áp dụng học tự giám sát trên đồ thị, ta sẽ tiếp tục so sánh với các model học gợi ý khác.
+
+\subsection{Cải thiện so với học gợi ý không áp dụng tự giám sát}
+
+\noindent Bên cạnh những so sánh giữa kết quả chạy thực nghiệm của nhóm với tác giả, ta cũng so sánh với những mô hình học gợi ý khác nhằm làm rõ hơn hiệu quả mà phương pháp tiếp cận này mang lại. Một số mô hình học khác mà ta sẽ so sánh:
+
+\begin{itemize}
+    \item[] \textbf{NeuMF} \cite{NeuMF}: một trong những mô hình đầu tiên cho thấy hiệu quả của việc áp dụng mạng neuron trong việc khai thác tín hiệu Collaborative filtering.
+    
+    \item[] \textbf{NGCF} \cite{NGCF}: khai thác cấu trúc đồ thị với cơ chế neighborhood aggregation trong mạng tích chập đồ thị dựa trên Collaborative filtering.
+    
+    \item[] \textbf{LighGCN} \cite{LightGCN}: model nền mà ta đã áp dụng học tự giám sát, đã mô tả chi tiết ở chương trước, cải tiến dựa trên mô hình mạng tích chập đồ thị, sao cho nhẹ hơn, phù hợp hơn với tác vụ gợi ý.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \hspace*{-10mm}
+    \includesvg[width=1.1\linewidth]{images/Chapter4/yelp2018.svg}
+    \caption{So sánh kết quả chạy trên Yelp2018.}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \hspace*{-10mm}
+    \includesvg[width=1.1\linewidth]{images/Chapter4/amazon.svg}
+    \caption{So sánh kết quả chạy trên Amazon Book.}
+\end{figure}
+
+Các kết quả từ các mô hình gợi ý khác được trích từ các bài báo gốc, kết quả chạy cho iFashion đã bị lược đi vì các tác giả của các bài báo gốc không sử dụng tập dữ liệu đó để đánh giá.
+
+Có thể thấy từ kết quả thì khi áp dụng mạng tích chập đồ thị (NGCF và LightGCN), chất lượng gợi ý cải thiện hơn nhiều so với mạng học neuron bình thường (NeuMF). Và khi áp dụng học tự giám sát thì hiệu suất gợi ý còn tăng hơn nữa. Cụ thể là so với model nền LightGCN, áp dụng học tự giám sát giúp tăng hiệu suất lên đến 6.3\% (Recall) và 6.1\% (NDCG) trên bộ dữ liệu Yelp2018, tăng 17.8\% (Recall) và 21.1\% (NDCG) trên bộ dữ liệu Amazon Book. Ngoài ra, dựa vào bài báo gốc của LightGCN \cite{LightGCN} và thử nghiệm của Wu \cite{SGL}, LightGCN cần đến 700-800 epoch để hội tụ trên bộ dữ liệu Yelp2018 và Amazon Book, trong khi nhóm thử nghiệm thấy nếu áp dụng học tự giám sát thì chỉ mất trung bình 16-20 epoch để hội tụ trên hai bộ dữ liệu đó, nhanh hơn rất nhiều so với LightGCN. Điều này cho thấy tính vượt trội của học tự giám sát so với học không áp dụng tự giám sát.
+

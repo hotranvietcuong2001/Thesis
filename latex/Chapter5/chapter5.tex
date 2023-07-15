@@ -1,0 +1,21 @@
+\chapter{Tổng kết và hướng phát triển} \label{Chapter5}
+
+\section{Tổng kết}
+
+\noindent Dữ liệu tương tác giữa người dùng và sản phẩm là rất ít so với toàn bộ không gian tương tác hoặc có thể nói là không ``đủ'', là một trong những vấn đề cốt lõi mà bất kỳ các nhà nghiên cứu nào cũng gặp phải khi xây dựng hệ thống gợi ý. Khóa luận cũng đã trình bày việc áp dụng phương pháp Học tự giám sát trên mạng học sâu đồ thị cho hệ thống này nhằm mục đích giải quyết phần nào những vấn đề mà hệ thống đang gặp phải từ đó nâng cao trải nghiệm của người dùng lẫn doanh thu cho doanh nghiệp.
+
+Để cải tiến việc học biểu diễn của đồ thị, ta đã áp dụng ba loại tăng cường dữ liệu khác nhau cho đồ thị như Edge Dropout (bỏ cạnh), Node Dropout (bỏ node), Random walk nhằm tạo ra các biến thể từ mỗi node. Từ đó, Học tương phản -- Contrastive Learning sẽ tối ưu việc học biểu diễn, phụ trợ cho tác vụ gợi ý thông qua việc thúc đẩy tính nhất quán/tương phản của các node trong không gian nhúng dựa trên sự tương đồng/khác nhau về đặc trưng giữa các node đó.
+
+Bằng thực nghiệm, kết quả đã chứng minh được tính hiệu quả của phương pháp đề xuất trên cả ba bộ dữ liệu rất thưa, bên cạnh đó còn cho thấy sự cải tiến về hiệu năng so với các mô hình trước. Kết quả từ việc nghiên cứu, thực nghiệm này cho thấy đây chỉ là mở đầu cho việc áp dụng mô hình học tự giám sát trong bài toán hệ thống gợi ý, điều này đồng nghĩa với việc lĩnh vực này vẫn còn tiềm năng rất lớn để tiếp tục khám phá, cải thiện trong tương lai.
+
+\section{Hướng phát triển}
+
+\noindent Những nghiên cứu đã trình bày trong khóa luận này chỉ mang tính thử nghiệm và đánh giá lại hơn là việc tạo ra sự đột phá so với phiên bản gốc mà tác giả Wu đã trình bày. Ta có thể dựa vào đây để phát triển thêm cho việc áp dụng học tự giám sát vào hệ thống gợi ý nói chung trong tương lai. 
+
+Việc chọn các biện pháp tăng cường có ảnh hưởng lớn đến việc học biểu diễn. Áp dụng tăng cường dữ liệu cho đồ thị không chỉ dừng lại ở việc áp dụng ba loại như đã đề cập kể trên. Ta có thể tập trung nghiên cứu xây dựng nhiều loại tăng cường mạnh mẽ hơn, phù hợp hơn nhằm cải thiện việc cho học biểu diễn, từ đó thúc đẩy hiệu quả chung của hệ thống.
+    
+Bên cạnh đó, ta cũng cần khảo sát độ hiệu quả của các phương án huấn luyện khác như Pretraining and fine-tuning (như đã đề cập, với cách này ta sẽ pretrain trên dữ liệu được tăng cường, sau đó, sẽ sử dụng pretrain encoder thu được ở trên để fine-tune cho dữ liệu gốc) Việc này nhằm khảo sát độ hiệu quả của chúng cho việc cải thiện hệ thống gợi ý và so sánh với cách Joint Learning đang áp dụng.
+
+Ta đã tập trung nghiên cứu, áp dụng và cải tiến việc sử dụng Học tương phản -- Contrastive Learning. Generative cũng là một cách để tiếp cận để áp dụng mô hình học Học tự giám sát lên hệ thống gợi ý. Hệ thống sẽ học được cách biểu diễn tốt hơn dựa vào việc tái tạo lại dữ liệu gốc từ dữ liệu embedding của dữ liệu mà trước đó đã bị làm hỏng. Sau đó, dữ liệu này và dữ liệu gốc thực sự sẽ được so sánh với nhau.
+
+

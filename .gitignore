@@ -1,0 +1,7 @@
+.vscode
+output/
+dataset/pretrain-embeddings*
+dataset/_tmp_*
+__pycache__
+model_tmp/
+log/

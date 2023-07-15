@@ -1,0 +1,673 @@
+%%
+%% WinShell 3.3.2.6
+%% http://www.winshell.org/
+%%
+
+% Strings
+
+
+% Preamble
+
+
+% BibTeX Entries
+@article{survey:sota-rec-system,
+title               = {Toward the next generation of recommender systems: A survey of the state-of-the-art and possible extensions},
+author              = {Adomavicius, Gediminas and Tuzhilin, Alexander},
+journal             = {IEEE transactions on knowledge and data engineering},
+volume              = {17},
+number              = {6},
+pages               = {734--749},
+year                = {2005},
+publisher           = {IEEE}
+}
+
+@article{ssl-genorcont,
+title               = {Self-supervised learning: Generative or contrastive},
+author              = {Liu, Xiao and Zhang, Fanjin and Hou, Zhenyu and Mian, Li and Wang, Zhaoyu and Zhang, Jing and Tang, Jie},
+journal             = {IEEE Transactions on Knowledge and Data Engineering},
+volume              = {35},
+number              = {1},
+pages               = {857--876},
+year                = {2021},
+publisher           = {IEEE}
+}
+
+@article{review:GNN,
+title               = {Graph neural networks: A review of methods and applications},
+author              = {Zhou, Jie and Cui, Ganqu and Hu, Shengding and Zhang, Zhengyan and Yang, Cheng and Liu, Zhiyuan and Wang, Lifeng and Li, Changcheng and Sun, Maosong},
+journal             = {AI open},
+volume              = {1},
+pages               = {57--81},
+year                = {2020},
+publisher           = {Elsevier}
+}
+
+@article{survey:GNN,
+title               = {A comprehensive survey on graph neural networks},
+author              = {Wu, Zonghan and Pan, Shirui and Chen, Fengwen and Long, Guodong and Zhang, Chengqi and Philip, S Yu},
+journal             = {IEEE transactions on neural networks and learning systems},
+volume              = {32},
+number              = {1},
+pages               = {4--24},
+year                = {2020},
+publisher           = {IEEE}
+}
+
+@article{survey:aug-for-dgl,
+title               = {Data augmentation for deep graph learning: A survey},
+author              = {Ding, Kaize and Xu, Zhe and Tong, Hanghang and Liu, Huan},
+journal             = {ACM SIGKDD Explorations Newsletter},
+volume              = {24},
+number              = {2},
+pages               = {61--77},
+year                = {2022},
+publisher           = {ACM New York, NY, USA}
+}
+
+@inproceedings{large-graphs-data-aug,
+title               = {Robust optimization as data augmentation for large-scale graphs},
+author              = {Kong, Kezhi and Li, Guohao and Ding, Mucong and Wu, Zuxuan and Zhu, Chen and Ghanem, Bernard and Taylor, Gavin and Goldstein, Tom},
+booktitle           = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+pages               = {60--69},
+year                = {2022}
+}
+
+@inproceedings{messagepassing-quantum-chemistry,
+title               = {Neural message passing for quantum chemistry},
+author              = {Gilmer, Justin and Schoenholz, Samuel S and Riley, Patrick F and Vinyals, Oriol and Dahl, George E},
+booktitle           = {International conference on machine learning},
+pages               = {1263--1272},
+year                = {2017},
+organization        = {PMLR}
+}
+
+@article{strat-pretrain-GNN,
+title               = {Strategies for pre-training graph neural networks},
+author              = {Hu, Weihua and Liu, Bowen and Gomes, Joseph and Zitnik, Marinka and Liang, Percy and Pande, Vijay and Leskovec, Jure},
+eprinttype          = {arXiv},
+eprint              = {1905.12265},
+year                = {2019}
+}
+
+@inproceedings{higher-order-GNN,
+title               = {Weisfeiler and leman go neural: Higher-order graph neural networks},
+author              = {Morris, Christopher and Ritzert, Martin and Fey, Matthias and Hamilton, William L and Lenssen, Jan Eric and Rattan, Gaurav and Grohe, Martin},
+booktitle           = {Proceedings of the AAAI conference on artificial intelligence},
+volume              = {33},
+number              = {01},
+pages               = {4602--4609},
+year                = {2019}
+}
+
+@article{survey:rec-sys-tech&issues,
+title               = {Recommendation system techniques and related issues: a survey},
+author              = {Kumar, Pushpendra and Thakur, Ramjeevan Singh},
+journal             = {International Journal of Information Technology},
+volume              = {10},
+pages               = {495--501},
+year                = {2018},
+DOI                 = {10.1007/s41870-018-0138-8}
+}
+
+@misc{survey:ssl-for-rec-sys,
+title               = {Self-Supervised Learning for Recommender Systems: A Survey}, 
+author              = {Yu, Junliang and Yin, Hongzhi and Xia, Xin and Chen, Tong and Li, Jundong and Huang, Zi},
+year                = {2022},
+eprint              = {2203.15876},
+archivePrefix       = {arXiv},
+primaryClass        = {cs.IR},
+% DOI                 = {https://doi.org/10.48550/arXiv.2203.15876}
+}
+
+@misc{survey:img-aug-for-deeplearning,
+title               = {Image Data Augmentation for Deep Learning: A Survey}, 
+author              = {Suorong Yang and Weikang Xiao and Mengcheng Zhang and Suhan Guo and Jian Zhao and Furao Shen},
+year                = {2022},
+eprint              = {2204.08610},
+archivePrefix       = {arXiv},
+primaryClass        = {cs.CV}
+}
+
+@misc{CoCon,
+title               = {CoCon: A Self-Supervised Approach for Controlled Text Generation}, 
+author              = {Alvin Chan and Yew-Soon Ong and Bill Pung and Aston Zhang and Jie Fu},
+year                = {2022},
+eprint              = {2006.03535},
+archivePrefix       = {arXiv},
+primaryClass        = {cs.CL}
+}
+
+@article{review:ssl-of-GNN,
+author              ={Xie, Yaochen and Xu, Zhao and Zhang, Jingtun and Wang, Zhengyang and Ji, Shuiwang},
+journal             = {IEEE Transactions on Pattern Analysis and Machine Intelligence}, 
+title               = {Self-Supervised Learning of Graph Neural Networks: A Unified Review}, 
+year                = {2023},
+volume              = {45},
+number              = {2},
+pages               = {2412-2429},
+doi                 = {10.1109/TPAMI.2022.3170559}
+}
+
+@misc{survey:ssl-from-perspectives,
+title               = {A Survey of Self-Supervised Learning from Multiple Perspectives: Algorithms, Theory, Applications and Future Trends}, 
+author              = {Jie Gui and Tuo Chen and Qiong Cao and Zhenan Sun and Hao Luo and Dacheng Tao},
+year                = {2023},
+eprint              = {2301.05712},
+archivePrefix       = {arXiv},
+primaryClass        = {cs.LG}
+}
+
+@ARTICLE{ssrl,
+author              = {Ericsson, Linus and Gouk, Henry and Loy, Chen Change and Hospedales, Timothy M.},
+journal             = {IEEE Signal Processing Magazine}, 
+title               = {Self-Supervised Representation Learning: Introduction, advances, and challenges}, 
+year                = {2022},
+volume              = {39},
+number              = {3},
+pages               = {42-62},
+doi                 = {10.1109/MSP.2021.3134634}
+}
+
+@misc{GMAE,
+title               = {Graph Masked Autoencoders with Transformers}, 
+author              = {Sixiao Zhang and Hongxu Chen and Haoran Yang and Xiangguo Sun and Philip S. Yu and Guandong Xu},
+year                = {2022},
+eprint              = {2202.08391},
+archivePrefix       = {arXiv},
+primaryClass        = {cs.LG}
+}
+
+@misc{MGAE,
+title               = {MGAE: Masked Autoencoders for Self-Supervised Learning on Graphs}, 
+author              = {Qiaoyu Tan and Ninghao Liu and Xiao Huang and Rui Chen and Soo-Hyun Choi and Xia Hu},
+year                = {2022},
+eprint              = {2201.02534},
+archivePrefix       = {arXiv},
+primaryClass        = {cs.LG}
+}
+
+@inproceedings{GraphCL,
+author              = {You, Yuning and Chen, Tianlong and Sui, Yongduo and Chen, Ting and Wang, Zhangyang and Shen, Yang},
+booktitle           = {Advances in Neural Information Processing Systems},
+editor              = {H. Larochelle and M. Ranzato and R. Hadsell and M.F. Balcan and H. Lin},
+pages               = {5812--5823},
+publisher           = {Curran Associates, Inc.},
+title               = {Graph Contrastive Learning with Augmentations},
+% url                 = {https://proceedings.neurips.cc/paper_files/paper/2020/file/3fe230348e9a12c13120749e3f9fa4cd-Paper.pdf},
+volume              = {33},
+year                = {2020}
+}
+
+@article{MGM,
+title               = {Masked graph modeling for molecule generation},
+author              = {Mahmood, Omar and Mansimov, Elman and Bonneau, Richard and Cho, Kyunghyun},
+journal             = {Nature communications},
+volume              = {12},
+number              = {1},
+pages               = {3156},
+year                = {2021},
+publisher           = {Nature Publishing Group UK London}
+}
+
+@misc{BGRL,
+title               = {Large-Scale Representation Learning on Graphs via Bootstrapping}, 
+author              = {Shantanu Thakoor and Corentin Tallec and Mohammad Gheshlaghi Azar and Mehdi Azabou and Eva L. Dyer and Rémi Munos and Petar Veličković and Michal Valko},
+year                = {2023},
+eprint              = {2102.06514},
+archivePrefix       = {arXiv},
+primaryClass        = {cs.LG}
+}
+
+@misc{graphs-curvature,
+title               = {Understanding over-squashing and bottlenecks on graphs via curvature}, 
+author              = {Jake Topping and Francesco Di Giovanni and Benjamin Paul Chamberlain and Xiaowen Dong and Michael M. Bronstein},
+year                = {2022},
+eprint              = {2111.14522},
+archivePrefix       = {arXiv},
+primaryClass        = {stat.ML}
+}
+
+@inproceedings{data-aug-for-GNN,
+title               = {Data augmentation for graph neural networks},
+author              = {Zhao, Tong and Liu, Yozen and Neves, Leonardo and Woodford, Oliver and Jiang, Meng and Shah, Neil},
+booktitle           = {Proceedings of the aaai conference on artificial intelligence},
+volume              = {35},
+number              = {12},
+pages               = {11015--11023},
+year                = {2021}
+}
+
+@inproceedings{GNN-via-topo-denoising,
+author              = {Luo, Dongsheng and Cheng, Wei and Yu, Wenchao and Zong, Bo and Ni, Jingchao and Chen, Haifeng and Zhang, Xiang},
+title               = {Learning to Drop: Robust Graph Neural Network via Topological Denoising},
+year                = {2021},
+% isbn                = {9781450382977},
+publisher           = {Association for Computing Machinery},
+address             = {New York, NY, USA},
+% url                 = {https://doi.org/10.1145/3437963.3441734},
+doi                 = {10.1145/3437963.3441734},
+booktitle           = {Proceedings of the 14th ACM International Conference on Web Search and Data Mining},
+pages               = {779–787},
+numpages            = {9},
+keywords            = {deep learning, graph analysis, graph neural networks},
+location            = {Virtual Event, Israel},
+series              = {WSDM '21}
+}
+
+@ARTICLE{graph-adversarial-training,
+author              = {Feng, Fuli and He, Xiangnan and Tang, Jie and Chua, Tat-Seng},
+journal             = {IEEE Transactions on Knowledge and Data Engineering}, 
+title               = {Graph Adversarial Training: Dynamically Regularizing Based on Graph Structure}, 
+year                = {2021},
+volume              = {33},
+number              = {6},
+pages               = {2493-2504},
+doi                 = {10.1109/TKDE.2019.2957786}
+}
+
+@inproceedings{graph-adversarial-SSL,
+author              = {Yang, Longqi and Zhang, Liangliang and Yang, Wenjing},
+booktitle           = {Advances in Neural Information Processing Systems},
+editor              = {M. Ranzato and A. Beygelzimer and Y. Dauphin and P.S. Liang and J. Wortman Vaughan},
+pages               = {14887--14899},
+publisher           = {Curran Associates, Inc.},
+title               = {Graph Adversarial Self-Supervised Learning},
+% url                 = {https://proceedings.neurips.cc/paper_files/paper/2021/file/7d3010c11d08cf990b7614d2c2ca9098-Paper.pdf},
+volume              = {34},
+year                = {2021}
+}
+
+@inproceedings{denoise-implicit-feedback,
+author              = {Wang, Wenjie and Feng, Fuli and He, Xiangnan and Nie, Liqiang and Chua, Tat-Seng},
+title               = {Denoising Implicit Feedback for Recommendation},
+year                = {2021},
+% isbn                = {9781450382977},
+publisher           = {Association for Computing Machinery},
+address             = {New York, NY, USA},
+% url                 = {https://doi.org/10.1145/3437963.3441800},
+doi                 = {10.1145/3437963.3441800},
+booktitle           = {Proceedings of the 14th ACM International Conference on Web Search and Data Mining},
+pages               = {373–381},
+numpages            = {9},
+location            = {Virtual Event, Israel},
+series              = {WSDM '21}
+}
+
+@INPROCEEDINGS{CF-for-implicit-feedback,
+author              = {Hu, Yifan and Koren, Yehuda and Volinsky, Chris},
+booktitle           = {2008 Eighth IEEE International Conference on Data Mining}, 
+title               = {Collaborative Filtering for Implicit Feedback Datasets}, 
+year                = {2008},
+pages               = {263-272},
+doi                 = {10.1109/ICDM.2008.22}
+}
+
+@inproceedings{GraphSAGE,
+author              = {Hamilton, Will and Ying, Zhitao and Leskovec, Jure},
+booktitle           = {Advances in Neural Information Processing Systems},
+editor              = {I. Guyon and U. Von Luxburg and S. Bengio and H. Wallach and R. Fergus and S. Vishwanathan and R. Garnett},
+publisher           = {Curran Associates, Inc.},
+title               = {Inductive Representation Learning on Large Graphs},
+% url                 = {https://proceedings.neurips.cc/paper_files/paper/2017/file/5dd9db5e033da9c6fb5ba83c7a7ebea9-Paper.pdf},
+volume              = {30},
+year                = {2017}
+}
+
+@article{GC-model,
+title               = {Molecular graph convolutions: moving beyond fingerprints},
+author              = {Kearnes, Steven and McCloskey, Kevin and Berndl, Marc and Pande, Vijay and Riley, Patrick},
+journal             = {Journal of computer-aided molecular design},
+volume              = {30},
+pages               = {595--608},
+year                = {2016},
+publisher           = {Springer}
+}
+
+@misc{GG-NN,
+title               = {Gated Graph Sequence Neural Networks}, 
+author              = {Yujia Li and Daniel Tarlow and Marc Brockschmidt and Richard Zemel},
+year                = {2017},
+eprint              = {1511.05493},
+archivePrefix       = {arXiv},
+primaryClass        = {cs.LG}
+}
+
+@INPROCEEDINGS{large-scale-amazon-reviews,
+author              = {Haque, Tanjim Ul and Saber, Nudrat Nawal and Shah, Faisal Muhammad},
+booktitle           = {2018 IEEE International Conference on Innovative Research and Development (ICIRD)}, 
+title               = {Sentiment analysis on large scale Amazon product reviews}, 
+year                = {2018},
+pages               = {1-6},
+doi                 = {10.1109/ICIRD.2018.8376299}
+}
+
+@misc{GIN,
+title               = {How Powerful are Graph Neural Networks?}, 
+author              = {Keyulu Xu and Weihua Hu and Jure Leskovec and Stefanie Jegelka},
+year                = {2019},
+eprint              = {1810.00826},
+archivePrefix       = {arXiv},
+primaryClass        = {cs.LG}
+}
+
+@misc{GCN-model,
+title               = {Semi-Supervised Classification with Graph Convolutional Networks}, 
+author              = {Thomas N. Kipf and Max Welling},
+year                = {2017},
+eprint              = {1609.02907},
+archivePrefix       = {arXiv},
+primaryClass        = {cs.LG}
+}
+
+@article{MGAT,
+title               = {MGAT: Multimodal Graph Attention Network for Recommendation},
+journal             = {Information Processing \& Management},
+volume              = {57},
+number              = {5},
+pages               = {102277},
+year                = {2020},
+issn                = {0306-4573},
+doi                 = {10.1016/j.ipm.2020.102277},
+% url                 = {https://www.sciencedirect.com/science/article/pii/S0306457320300182},
+author              = {Zhulin Tao and Yinwei Wei and Xiang Wang and Xiangnan He and Xianglin Huang and Tat-Seng Chua},
+keywords            = {Personalized recommendation, Graph, Gate mechanism, Attention mechanism, Micro-videos},
+}
+
+@misc{BPR-loss,
+title               = {BPR: Bayesian Personalized Ranking from Implicit Feedback}, 
+author              = {Steffen Rendle and Christoph Freudenthaler and Zeno Gantner and Lars Schmidt-Thieme},
+year                = {2012},
+eprint              = {1205.2618},
+archivePrefix       = {arXiv},
+primaryClass        = {cs.IR}
+}
+
+@inproceedings{PinSAGE,
+author              = {Ying, Rex and He, Ruining and Chen, Kaifeng and Eksombatchai, Pong and Hamilton, William L. and Leskovec, Jure},
+title               = {Graph Convolutional Neural Networks for Web-Scale Recommender Systems},
+year                = {2018},
+% isbn                = {9781450355520},
+publisher           = {Association for Computing Machinery},
+% url = {https://doi.org/10.1145/3219819.3219890},
+doi                 = {10.1145/3219819.3219890},
+booktitle           = {Proceedings of the 24th ACM SIGKDD International Conference on Knowledge Discovery \&amp; Data Mining},
+pages               = {974–983},
+keywords            = {scalability, recommender systems, graph convolutional networks, deep learning},
+series              = {KDD '18}
+}
+
+@inproceedings{DGCN,
+author              = {Zhuang, Chenyi and Ma, Qiang},
+title               = {Dual Graph Convolutional Networks for Graph-Based Semi-Supervised Classification},
+year                = {2018},
+% isbn                = {9781450356398},
+publisher           = {International World Wide Web Conferences Steering Committee},
+% url                 = {https://doi.org/10.1145/3178876.3186116},
+doi                 = {10.1145/3178876.3186116},
+booktitle           = {Proceedings of the 2018 World Wide Web Conference},
+pages               = {499–508},
+keywords            = {adjacency matrix, pointwise mutual information, graph diffusion, graph convolutional networks, semi-supervised learning},
+series              = {WWW '18}
+}
+
+@misc{GC-MC,
+title               = {Graph Convolutional Matrix Completion}, 
+author              = {Rianne van den Berg and Thomas N. Kipf and Max Welling},
+year                = {2017},
+eprint              = {1706.02263},
+archivePrefix       = {arXiv},
+primaryClass        = {stat.ML}
+}
+
+@inproceedings{NGCF,
+author              = {Wang, Xiang and He, Xiangnan and Wang, Meng and Feng, Fuli and Chua, Tat-Seng},
+title               = {Neural Graph Collaborative Filtering},
+year                = {2019},
+% isbn                = {9781450361729},
+publisher           = {Association for Computing Machinery},
+% url                 = {https://doi.org/10.1145/3331184.3331267},
+doi                 = {10.1145/3331184.3331267},
+booktitle           = {Proceedings of the 42nd International ACM SIGIR Conference on Research and Development in Information Retrieval},
+pages               = {165–174},
+keywords            = {high-order connectivity, collaborative filtering, graph neural network, recommendation, embedding propagation},
+series              = {SIGIR'19}
+}
+
+@inproceedings{LightGCN,
+author              = {He, Xiangnan and Deng, Kuan and Wang, Xiang and Li, Yan and Zhang, YongDong and Wang, Meng},
+title               = {LightGCN: Simplifying and Powering Graph Convolution Network for Recommendation},
+year                = {2020},
+% isbn                = {9781450380164},
+publisher           = {Association for Computing Machinery},
+% url                 = {https://doi.org/10.1145/3397271.3401063},
+doi                 = {10.1145/3397271.3401063},
+booktitle           = {Proceedings of the 43rd International ACM SIGIR Conference on Research and Development in Information Retrieval},
+pages               = {639–648},
+keywords            = {recommendation, collaborative filtering, embedding propagation, graph neural network},
+series              = {SIGIR '20}
+}
+
+@article{survey:attention-models,
+author              = {Chaudhari, Sneha and Mithal, Varun and Polatkan, Gungor and Ramanath, Rohan},
+title               = {An Attentive Survey of Attention Models},
+year                = {2021},
+issue_date          = {October 2021},
+publisher           = {Association for Computing Machinery},
+volume              = {12},
+number              = {5},
+issn                = {2157-6904},
+% url                 = {https://doi.org/10.1145/3465055},
+doi                 = {10.1145/3465055},
+journal             = {ACM Trans. Intell. Syst. Technol.},
+month               = {10},
+articleno           = {53},
+keywords            = {attention models, Attention, neural networks}
+}
+
+@inproceedings{attentive-CF,
+author              = {Chen, Jingyuan and Zhang, Hanwang and He, Xiangnan and Nie, Liqiang and Liu, Wei and Chua, Tat-Seng},
+title               = {Attentive Collaborative Filtering: Multimedia Recommendation with Item- and Component-Level Attention},
+year                = {2017},
+% isbn                = {9781450350228},
+publisher           = {Association for Computing Machinery},
+% url                 = {https://doi.org/10.1145/3077136.3080797},
+doi                 = {10.1145/3077136.3080797},
+booktitle           = {Proceedings of the 40th International ACM SIGIR Conference on Research and Development in Information Retrieval},
+pages               = {335–344},
+keywords            = {collaborative filtering, implicit feedback, attention, multimedia recommendation},
+series              = {SIGIR '17}
+}
+
+@inproceedings{insights-GCN,
+title               = {Deeper insights into graph convolutional networks for semi-supervised learning},
+author              = {Li, Qimai and Han, Zhichao and Wu, Xiao-Ming},
+booktitle           = {Proceedings of the AAAI conference on artificial intelligence},
+volume              = {32},
+number              = {1},
+year                = {2018}
+}
+
+@inproceedings{SGL,
+author              = {Wu, Jiancan and Wang, Xiang and Feng, Fuli and He, Xiangnan and Chen, Liang and Lian, Jianxun and Xie, Xing},
+title               = {Self-Supervised Graph Learning for Recommendation},
+year                = {2021},
+% isbn                = {9781450380379},
+publisher           = {Association for Computing Machinery},
+% url                 = {https://doi.org/10.1145/3404835.3462862},
+doi                 = {10.1145/3404835.3462862},
+booktitle           = {Proceedings of the 44th International ACM SIGIR Conference on Research and Development in Information Retrieval},
+pages               = {726–735},
+keywords            = {graph neural network, collaborative filtering, self-supervised learning, long-tail recommendation},
+series              = {SIGIR '21}
+}
+
+@article{power-law-dist,
+title               = {Power-law distributions in empirical data},
+author              = {Clauset, Aaron and Shalizi, Cosma Rohilla and Newman, Mark EJ},
+journal             = {SIAM review},
+volume              = {51},
+number              = {4},
+pages               = {661--703},
+year                = {2009},
+publisher           = {SIAM}
+}
+
+@inproceedings{bipartite-graph-partition,
+author              = {Zha, Hongyuan and He, Xiaofeng and Ding, Chris and Simon, Horst and Gu, Ming},
+title               = {Bipartite Graph Partitioning and Data Clustering},
+year                = {2001},
+% isbn                = {1581134363},
+publisher           = {Association for Computing Machinery},
+% url                 = {https://doi.org/10.1145/502585.502591},
+doi                 = {10.1145/502585.502591},
+booktitle           = {Proceedings of the Tenth International Conference on Information and Knowledge Management},
+pages               = {25–32},
+keywords            = {singular value decomposition, document clustering, graph partitioning, bipartite graph, spectral relaxation, correspondence analysis},
+series              = {CIKM '01}
+}
+
+@inproceedings{GCC,
+author              = {Qiu, Jiezhong and Chen, Qibin and Dong, Yuxiao and Zhang, Jing and Yang, Hongxia and Ding, Ming and Wang, Kuansan and Tang, Jie},
+title               = {GCC: Graph Contrastive Coding for Graph Neural Network Pre-Training},
+year                = {2020},
+% isbn                = {9781450379984},
+publisher           = {Association for Computing Machinery},
+% url                 = {https://doi.org/10.1145/3394486.3403168},
+doi                 = {10.1145/3394486.3403168},
+booktitle           = {Proceedings of the 26th ACM SIGKDD International Conference on Knowledge Discovery \&amp; Data Mining},
+pages               = {1150–1160},
+keywords            = {graph neural network, graph representation learning, pre-training},
+series              = {KDD '20}
+}
+
+@inproceedings{SimCLR,
+title               = {A simple framework for contrastive learning of visual representations},
+author              = {Chen, Ting and Kornblith, Simon and Norouzi, Mohammad and Hinton, Geoffrey},
+booktitle           = {International conference on machine learning},
+pages               = {1597--1607},
+year                = {2020},
+organization        = {PMLR}
+}
+
+@inproceedings{InfoNCE,
+title               = {Noise-contrastive estimation: A new estimation principle for unnormalized statistical models},
+author              = {Gutmann, Michael and Hyv{\"a}rinen, Aapo},
+booktitle           = {Proceedings of the thirteenth international conference on artificial intelligence and statistics},
+pages               = {297--304},
+year                = {2010},
+organization        = {JMLR Workshop and Conference Proceedings}
+}
+
+@misc{survey:graph-rep-learning,
+title               = {A Survey on Graph Representation Learning Methods}, 
+author              = {Shima Khoshraftar and Aijun An},
+year                = {2022},
+eprint              = {2204.01855},
+archivePrefix       = {arXiv},
+primaryClass        = {cs.LG}
+}
+
+@InProceedings{MoCo,
+author              = {He, Kaiming and Fan, Haoqi and Wu, Yuxin and Xie, Saining and Girshick, Ross},
+title               = {Momentum Contrast for Unsupervised Visual Representation Learning},
+booktitle           = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+month               = {6},
+year                = {2020}
+}
+
+@misc{DeepInfoMax,
+title               = {Learning deep representations by mutual information estimation and maximization}, 
+author              = {R Devon Hjelm and Alex Fedorov and Samuel Lavoie-Marchildon and Karan Grewal and Phil Bachman and Adam Trischler and Yoshua Bengio},
+year                = {2019},
+eprint              = {1808.06670},
+archivePrefix       = {arXiv},
+primaryClass        = {stat.ML}
+}
+
+@inproceedings{decoupled-loss,
+title               = {Decoupled contrastive learning},
+author              = {Yeh, Chun-Hsiao and Hong, Cheng-Yao and Hsu, Yen-Chi and Liu, Tyng-Luh and Chen, Yubei and LeCun, Yann},
+booktitle           = {Computer Vision--ECCV 2022: 17th European Conference, Tel Aviv, Israel, October 23--27, 2022, Proceedings, Part XXVI},
+pages               = {668--684},
+year                = {2022},
+organization        = {Springer}
+}
+
+@article{debiased-loss,
+title               = {Debiased contrastive learning},
+author              = {Chuang, Ching-Yao and Robinson, Joshua and Lin, Yen-Chen and Torralba, Antonio and Jegelka, Stefanie},
+journal             = {Advances in neural information processing systems},
+volume              = {33},
+pages               = {8765--8775},
+year                = {2020}
+}
+
+@misc{effectiveness-data-aug,
+title               = {The Effectiveness of Data Augmentation in Image Classification using Deep Learning}, 
+author              = {Luis Perez and Jason Wang},
+year                = {2017},
+eprint              = {1712.04621},
+archivePrefix       = {arXiv},
+primaryClass        = {cs.CV}
+}
+
+@misc{generic-top-N,
+title               = {A Generic Top-N Recommendation Framework For Trading-off Accuracy, Novelty, and Coverage},
+author              = {Zainab Zolaktaf and Reza Babanezhad and Rachel Pottinger},
+year                = {2018},
+eprint              = {1803.00146},
+archivePrefix       = {arXiv},
+primaryClass        = {cs.IR}
+}
+
+@inproceedings{RWR,
+title               = {Fast random walk with restart and its applications},
+author              = {Tong, Hanghang and Faloutsos, Christos and Pan, Jia-Yu},
+booktitle           = {Sixth international conference on data mining (ICDM'06)},
+pages               = {613--622},
+year                = {2006},
+organization        = {IEEE}
+}
+
+@inproceedings{NeuMF,
+title               = {Neural collaborative filtering},
+author              = {He, Xiangnan and Liao, Lizi and Zhang, Hanwang and Nie, Liqiang and Hu, Xia and Chua, Tat-Seng},
+booktitle           = {Proceedings of the 26th international conference on world wide web},
+pages               = {173--182},
+year                = {2017}
+}
+
+@article{content-based-rec,
+title               = {Content-based recommendation systems},
+author              = {Pazzani, Michael J and Billsus, Daniel},
+journal             = {The adaptive web: methods and strategies of web personalization},
+pages               = {325--341},
+year                = {2007},
+publisher           = {Springer}
+}
+
+@article{survey:CF-tech,
+title               = {A survey of collaborative filtering techniques},
+author              = {Su, Xiaoyuan and Khoshgoftaar, Taghi M},
+journal             = {Advances in artificial intelligence},
+volume              = {2009},
+year                = {2009},
+publisher           = {Hindawi}
+}
+
+@INPROCEEDINGS{cos-sim,
+author              = {Lahitani, Alfirna Rizqi and Permanasari, Adhistya Erna and Setiawan, Noor Akhmad},
+booktitle           = {2016 4th International Conference on Cyber and IT Service Management}, 
+title               = {Cosine similarity to determine similarity measure: Study case in online essay assessment}, 
+year                = {2016},
+pages               = {1-6},
+doi                 = {10.1109/CITSM.2016.7577578}
+}
+
+@book{intro-graph-theory,
+title               = {Introduction to graph theory},
+author              = {West, Douglas Brent and others},
+volume              = {2},
+year                = {2001},
+publisher           = {Prentice hall Upper Saddle River}
+}
