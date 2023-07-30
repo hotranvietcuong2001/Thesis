@@ -413,18 +413,18 @@ Học tự giám sát mở ra một con đường mới cho việc giải quyế
     \item[] \textbf{Thứ ba}, nhiệm vụ gợi ý đóng vai trò là nhiệm vụ chính, pretext task là nhiệm vụ phụ với vai trò tăng cường hiệu quả của nhiệm vụ gợi ý.
 \end{itemize}
 
-Hiện nay có rất nhiều phương thức tiếp cận SSR. Nhìn chung, mỗi model SSR chứa hai thành phần \cite{survey:ssl-for-rec-sys} chính: Encoder $\bm{f_\theta}$ và Projection head $\bm{g_\varphi}$. Encoder có thể là một mạng neuron (GNN, Multi-layer Perception...) với tập tham số học $\Theta$ và có nhiệm vụ học cách biểu diễn (embedding) $\mathbf{E}$ cho người dùng và sản phẩm từ dữ liệu. Projection head có cấu trúc đơn giản, có thể là một hàm tuyến tính, mapping, hoặc một mạng neuron đơn giản và có nhiệm vụ tối ưu hóa các biểu diễn đó cho nhiệm vụ gợi ý và/hoặc cho một nhiệm vụ pretext nào đó. Trong phạm vi khóa luận này, thành phần Projection head sẽ được chọn là một hàm đồng nhất. Mạng SSR tập trung giải bài toán sau:
+Hiện nay có rất nhiều phương thức tiếp cận SSR. Nhìn chung, mỗi model SSR chứa hai thành phần \cite{survey:ssl-for-rec-sys} chính: Encoder $\bm{f_\theta}$ và Projection head $\bm{g_\varphi}$. Encoder có thể là một mạng neuron (GNN, Multi-layer Perception...) với tập tham số học $\Theta$ và có nhiệm vụ học cách biểu diễn (embedding) $\mathbf{E}$ cho người dùng và sản phẩm từ dữ liệu. Projection head có cấu trúc đơn giản, có thể là một hàm tuyến tính, mapping, hoặc một mạng neuron đơn giản và có nhiệm vụ tối ưu hóa các biểu diễn đó cho nhiệm vụ gợi ý. Nói cách khác là bộ phận Head giúp model phân biệt tốt hơn những mẫu dữ liệu nào là giống nhau, những mẫu dữ liệu nào là khác nhau. Mạng SSR tập trung giải bài toán sau:
 \begin{equation}
     f_\theta, g_\varphi, \mathbf{E} = \underset{f_\theta, g_\varphi}{arg min}\mathcal{L}\left(g_\varphi(f_\theta(\mathcal{D}, \tilde{\mathcal{D}}))\right),
 \end{equation}
-với $\mathcal{D}$ và $\tilde{\mathcal{D}}$ dữ liệu ban đầu và đã tăng cường, $\mathcal{L}$ là hàm mất mát kết hợp giữa tác vụ gợi ý $\mathcal{L}_\textit{rec}$ (còn được ký hiệu là $\mathcal{L}_\textit{main}$) và tác vụ học không giám sát $\mathcal{L}_\textit{ssl}$. Từ tổng quát hóa trên, ta có thể phân thành 4 phương thức \cite{survey:ssl-for-rec-sys} SSR chủ yếu: \textbf{Contrastive Learning}, \textbf{Generative}, \textbf{Predictive} và \textbf{Hyrbrid}.
+với $\mathcal{D}$ và $\tilde{\mathcal{D}}$ dữ liệu ban đầu và đã tăng cường, $\mathcal{L}$ là hàm mất mát kết hợp giữa tác vụ gợi ý $\mathcal{L}_\textit{rec}$ và tác vụ học không giám sát $\mathcal{L}_\textit{ssl}$. Từ tổng quát hóa trên, ta có thể phân thành 4 phương thức \cite{survey:ssl-for-rec-sys} SSR chủ yếu: \textbf{Contrastive Learning}, \textbf{Generative}, \textbf{Predictive} và \textbf{Hyrbrid}.
 \begin{itemize}
     \item[] \textbf{Contrastive}: Kéo những bản sao tăng cường, gọi là các view, của cùng một instance (người dùng/sản phẩm) lại gần nhau, đẩy những view khác instance ra xa nhau trong không gian nhúng.\\
     \begin{minipage}{\linewidth}
         \vspace*{+5mm}
         \centering
         \includegraphics[scale=0.3]{images/Chapter3/contras_ssr.png}
-        \captionof{figure}[Sơ đồ tổng thể phương pháp Contrastive trong bài toán Self-supervised Recommendation.]{Sơ đồ tổng thể phương pháp Contrastive trong bài toán Self-supervised Recommendation. Thành phần Head $\bm{g_{\varphi_s}}$ ở đây có nhiệm vụ giúp model phân biệt tốt hơn những mẫu dữ liệu nào là giống nhau, những mẫu dữ liệu nào là khác nhau.}
+        \captionof{figure}[Sơ đồ tổng thể phương pháp Contrastive trong bài toán Self-supervised Recommendation.]{Sơ đồ tổng thể phương pháp Contrastive trong bài toán Self-supervised Recommendation.}
     \end{minipage}
     
     \item[] \textbf{Generative}: Dự đoán một phần của data gốc ban đầu đã bị làm hỏng.\\
@@ -432,7 +432,7 @@ với $\mathcal{D}$ và $\tilde{\mathcal{D}}$ dữ liệu ban đầu và đã t�
         \vspace*{+5mm}
         \centering
         \includegraphics[scale=0.3]{images/Chapter3/gen_ssr.png}
-        \captionof{figure}[Sơ đồ tổng thể phương pháp Generative trong bài toán Self-supervised Recommendation.]{Sơ đồ tổng thể phương pháp Generative trong bài toán Self-supervised Recommendation. Thành phần Decoder $\bm{g_{\varphi_s}}$ ở đây là một loại Head đặc biệt mà có nhiệm vụ tái tạo lại dữ liệu gốc từ dữ liệu embedding của dữ liệu đã bị làm hỏng. Sau đó dữ liệu này và dữ liệu gốc thực sự sẽ được so sánh với nhau.}
+        \captionof{figure}[Sơ đồ tổng thể phương pháp Generative trong bài toán Self-supervised Recommendation.]{Sơ đồ tổng thể phương pháp Generative trong bài toán Self-supervised Recommendation. Thành phần Decoder $\bm{g_\varphi}$ ở đây là một loại Head đặc biệt mà có nhiệm vụ tái tạo lại dữ liệu gốc từ dữ liệu embedding của dữ liệu đã bị làm hỏng. Sau đó dữ liệu này và dữ liệu gốc thực sự sẽ được so sánh với nhau.}
     \end{minipage}
     
     \item[] \textbf{Predictive}: Khá giống với phương pháp Generative. Nhưng trong khi mục tiêu của generative method là dự đoán data gốc, phương pháp Predictive, những mẫu dữ liệu mới hoặc nhãn dữ liệu mới sẽ được sinh ra để giúp tác vụ pretext.\\
